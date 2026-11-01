@@ -51,11 +51,13 @@ main{padding-bottom:60px}
 .btn.azul{background:var(--azul);border-color:var(--azul);color:#fff}
 .btn:disabled{opacity:.5;cursor:default}
 /* Envio */
-.zona{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;border:2px dashed #9bb8ad;border-radius:14px;padding:28px 16px;text-align:center;background:#f8fbfa;cursor:pointer;transition:background .15s}
+.zona{display:block;width:100%;border:2px dashed #9bb8ad;border-radius:14px;padding:28px 16px;text-align:center;background:#f8fbfa;cursor:pointer;transition:background .15s}
 .zona.sobre{background:var(--pri2);border-color:var(--pri)}
-.zona svg{width:42px;height:42px;color:var(--pri);flex:none}
-.zona b{display:block;font-size:1.05rem;margin-top:6px}
-.zona span{color:var(--mut);font-size:.9rem}
+.zona:focus-visible{outline:3px solid #f2b705;outline-offset:2px}
+.zona-ic{display:block;height:44px;margin:0 auto 6px;color:var(--pri)}
+.zona-ic svg{display:block;width:42px;height:42px;margin:0 auto}
+.zona-t{display:block;font-weight:700;font-size:1.05rem;line-height:1.3}
+.zona-s{display:block;color:var(--mut);font-size:.9rem;margin-top:2px}
 .lista-arq{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:8px}
 .arq{display:flex;gap:12px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px 12px;background:#fff}
 .arq .ic{flex:none;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:.8rem;background:var(--pri2);color:var(--pri)}
@@ -994,7 +996,7 @@ function alerta(t, foco){ let a=$('#alertaForm'); if(!a){ a=document.createEleme
 const ICONE_UP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>';
 function tela2(){
   $('#app').innerHTML='<section class="card"><h2>Envie os relatórios do PEC</h2><p class="lead">Pode enviar vários de uma vez, de uma ou de várias equipes. O site reconhece sozinho de qual indicador é cada relatório.</p>'+
-    '<label class="zona" id="zona" for="arqs">'+ICONE_UP+'<b>Toque para escolher os arquivos</b><span>ou arraste para cá · arquivos CSV exportados do PEC</span></label>'+
+    '<div class="zona" id="zona" role="button" tabindex="0" aria-label="Escolher os arquivos"><div class="zona-ic">'+ICONE_UP+'</div><div class="zona-t">Toque para escolher os arquivos</div><div class="zona-s">ou arraste para cá · arquivos CSV exportados do PEC</div></div>'+
     '<input type="file" id="arqs" accept=".csv,.txt,.pdf,text/csv" multiple class="oculto">'+
     '<ul class="lista-arq" id="lista"></ul>'+
     '<details class="ajuda"><summary>Como baixar os relatórios no PEC</summary><div><ol>'+
@@ -1007,6 +1009,8 @@ function tela2(){
     '<div class="acoes"><button class="btn" id="bV">Voltar</button><button class="btn pri" id="b2" disabled>Ver resultado</button></div></section>';
   const zona=$('#zona'), inp=$('#arqs');
   inp.onchange=()=>{ adicionar(inp.files); inp.value=''; };
+  zona.onclick=()=>inp.click();
+  zona.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); inp.click(); } };
   ['dragenter','dragover'].forEach(ev=>zona.addEventListener(ev,e=>{ e.preventDefault(); zona.classList.add('sobre'); }));
   ['dragleave','drop'].forEach(ev=>zona.addEventListener(ev,e=>{ e.preventDefault(); zona.classList.remove('sobre'); }));
   zona.addEventListener('drop',e=>adicionar(e.dataTransfer.files));
