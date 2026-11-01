@@ -51,9 +51,9 @@ main{padding-bottom:60px}
 .btn.azul{background:var(--azul);border-color:var(--azul);color:#fff}
 .btn:disabled{opacity:.5;cursor:default}
 /* Envio */
-.zona{border:2px dashed #9bb8ad;border-radius:14px;padding:28px 16px;text-align:center;background:#f8fbfa;cursor:pointer;transition:background .15s}
+.zona{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;border:2px dashed #9bb8ad;border-radius:14px;padding:28px 16px;text-align:center;background:#f8fbfa;cursor:pointer;transition:background .15s}
 .zona.sobre{background:var(--pri2);border-color:var(--pri)}
-.zona svg{width:42px;height:42px;color:var(--pri)}
+.zona svg{width:42px;height:42px;color:var(--pri);flex:none}
 .zona b{display:block;font-size:1.05rem;margin-top:6px}
 .zona span{color:var(--mut);font-size:.9rem}
 .lista-arq{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:8px}
