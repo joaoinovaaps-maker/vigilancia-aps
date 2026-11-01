@@ -123,10 +123,12 @@ footer{color:var(--mut);font-size:.82rem;text-align:center;padding:10px 0 30px}
     <div class="etapa" data-e="2"><b>2</b><span>Relatórios do PEC</span></div>
     <div class="etapa" data-e="3"><b>3</b><span>Resultado e planilhas</span></div>
   </nav>
-  <main id="app"></main>
+  <main id="app" autocomplete="off"></main>
   <footer>Secretaria Municipal de Saúde de Dourados-MS · LAB InovaAPS · Fiocruz<br>Os relatórios são lidos no seu navegador. Nenhum dado de paciente é enviado, exceto quando você escolhe criar no Google Planilhas.</footer>
 </div>
 <script>
+/* a página sempre começa limpa, inclusive ao voltar pelo navegador */
+window.addEventListener("pageshow",function(e){ if(e.persisted) location.reload(); });
 /* ===================== ESPECIFICAÇÃO DOS INDICADORES =====================
  * Fonte: Notas Metodológicas C1 a C7, B1 a B6, M1 e M2 (SAPS/MS) — mesmo modelo das
  * planilhas de vigilância da UBS Ildefonso Pedroso (Dourados-MS).
@@ -959,7 +961,7 @@ const UBS_DOURADOS = ['UBS Ildefonso Pedroso','UBS Jóquei Clube','UBS Maracanã
 const CHAVE='vigilancia-aps-pessoa';
 
 const E={ etapa:1, pessoa:{nome:'',categoria:'',ubs:''}, arquivos:[], dados:null, ref:null };
-try{ Object.assign(E.pessoa, JSON.parse(localStorage.getItem(CHAVE)||'{}')); }catch(e){}
+try{ localStorage.removeItem(CHAVE); }catch(e){}   // nada é guardado no aparelho (apaga o que versões anteriores salvaram)
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -975,10 +977,10 @@ function render(){
 
 /* ---------- 1. Identificação ---------- */
 function tela1(){
-  $('#app').innerHTML='<section class="card"><h2>Quem está gerando as planilhas?</h2><p class="lead">Esses dados aparecem no cabeçalho da planilha e ajudam a coordenação a acompanhar o uso. Ficam lembrados neste aparelho.</p>'+
-    '<div class="campos"><div class="campo todo"><label for="pNome">Nome completo</label><input id="pNome" autocomplete="name" value="'+esc(E.pessoa.nome)+'" placeholder="Ex.: Maria da Silva"></div>'+
+  $('#app').innerHTML='<section class="card"><h2>Quem está gerando as planilhas?</h2><p class="lead">Esses dados aparecem no cabeçalho da planilha e ajudam a coordenação a acompanhar o uso. Nada fica salvo neste aparelho.</p>'+
+    '<div class="campos"><div class="campo todo"><label for="pNome">Nome completo</label><input id="pNome" autocomplete="off" value="'+esc(E.pessoa.nome)+'" placeholder="Ex.: Maria da Silva"></div>'+
     '<div class="campo"><label for="pCat">Categoria profissional</label><select id="pCat"><option value="">Selecione</option>'+CATEGORIAS.map(c=>'<option'+(c===E.pessoa.categoria?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></div>'+
-    '<div class="campo"><label for="pUbs">UBS</label><input id="pUbs" list="lUbs" value="'+esc(E.pessoa.ubs)+'" placeholder="Digite ou escolha"><datalist id="lUbs">'+UBS_DOURADOS.map(u=>'<option value="'+esc(u)+'">').join('')+'</datalist><small>Se a sua UBS não aparecer, digite o nome.</small></div></div>'+
+    '<div class="campo"><label for="pUbs">UBS</label><input id="pUbs" list="lUbs" autocomplete="off" value="'+esc(E.pessoa.ubs)+'" placeholder="Digite ou escolha"><datalist id="lUbs">'+UBS_DOURADOS.map(u=>'<option value="'+esc(u)+'">').join('')+'</datalist><small>Se a sua UBS não aparecer, digite o nome.</small></div></div>'+
     '<div class="acoes"><button class="btn pri" id="b1">Continuar</button></div></section>';
   $('#b1').onclick=()=>{
     const nome=$('#pNome').value.trim(), cat=$('#pCat').value, ubs=$('#pUbs').value.trim();
@@ -986,7 +988,6 @@ function tela1(){
     if(!cat) return alerta('Escolha a categoria profissional.', '#pCat');
     if(ubs.length<3) return alerta('Informe a UBS.', '#pUbs');
     E.pessoa={nome, categoria:cat, ubs:/^ubs\b/i.test(ubs)?ubs:'UBS '+ubs};
-    try{ localStorage.setItem(CHAVE, JSON.stringify(E.pessoa)); }catch(e){}
     irEtapa(2);
   };
 }
@@ -1086,7 +1087,7 @@ function tela3(){
     '<div class="resumo">'+cartoes+'</div><h3 style="margin:20px 0 4px;font-size:1rem">Comparativo entre equipes</h3>'+tab+'</section>'+
     '<section class="card"><h2>Gerar as planilhas de monitoramento</h2><p class="lead">A planilha traz o painel com destaques, prospecção e cobertura por boa prática, e uma aba por indicador com cada pessoa e suas pendências. Ao marcar uma boa prática realizada, o painel se atualiza.</p>'+
     '<div class="formato"><div class="opcao"><h3>Excel</h3><p>Baixa o arquivo agora. Os dados ficam só no seu computador. As boas práticas são marcadas com Sim ou Não.</p><button class="btn pri" id="bX">Baixar planilha Excel</button></div>'+
-    '<div class="opcao"><h3>Google Planilhas</h3><p>Cria a planilha com caixas de marcar e envia o acesso para o seu e-mail Google.</p><div class="campo"><label for="gMail">Seu e-mail</label><input id="gMail" type="email" autocomplete="email" placeholder="nome@gmail.com"></div><button class="btn azul" id="bG">Criar no Google Planilhas</button></div></div>'+
+    '<div class="opcao"><h3>Google Planilhas</h3><p>Cria a planilha com caixas de marcar e envia o acesso para o seu e-mail Google.</p><div class="campo"><label for="gMail">Seu e-mail</label><input id="gMail" type="email" autocomplete="off" placeholder="nome@gmail.com"></div><button class="btn azul" id="bG">Criar no Google Planilhas</button></div></div>'+
     '<div id="saida"></div>'+
     '<div class="privacidade"><span aria-hidden="true">🔒</span><span>Estas planilhas contêm dados pessoais de saúde (LGPD). Guarde em local de acesso restrito e compartilhe só com a equipe responsável pelo cuidado.</span></div>'+
     '<div class="acoes"><button class="btn" id="bV">Voltar e trocar relatórios</button></div></section>';
