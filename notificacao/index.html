@@ -127,6 +127,12 @@ textarea:focus{outline:3px solid #9fd3bf;border-color:var(--pri)}
 .sug li:hover,.sug li.on{background:var(--pri2)}
 .sug li.vazio{color:var(--mut);cursor:default}
 input.auto,select.auto{background:#eaf7ef!important;transition:background 1s}
+.lista-agr{margin-top:6px;border:1.5px solid var(--bd);border-radius:10px;padding:4px;background:#fff;width:100%;font-size:.93rem}
+.lista-agr optgroup{font-weight:800;color:var(--mut);font-size:.8rem}
+.lista-agr option{padding:6px 8px;border-radius:6px;color:var(--tx);font-weight:400;font-size:.93rem}
+.lista-agr option:checked{background:var(--pri2)}
+.ficha-info{background:var(--azul2);color:#1d3f70;border-radius:12px;padding:10px 14px;font-size:.92rem;margin-top:12px}
+.ficha-info .pend{color:var(--warn)}
 .alerta-im{background:var(--err2);color:var(--err);border-radius:12px;padding:10px 14px;font-size:.92rem;margin-top:12px}
 .lembrar{display:flex;gap:8px;align-items:center;margin-top:14px;font-size:.92rem;color:var(--mut)}
 .ok{background:var(--ok2);color:#145a2c;border-radius:12px;padding:12px 14px;font-size:.95rem;margin:12px 0}
@@ -377,6 +383,80 @@ const AGRAVOS = [
   ['Violência sexual e tentativa de suicídio','Y09','I']
 ];
 
+
+/* Ficha oficial de cada agravo. outro: notificado em outro sistema; conf: confirmar com a vigilância. */
+const FICHA_DE = {
+ 'Acidente de trabalho grave, fatal e em crianças e adolescentes':['Ficha de Investigação – Acidente de Trabalho'],
+ 'Acidente de trabalho com exposição a material biológico':['Ficha de Investigação – Acidente de Trabalho com Exposição a Material Biológico'],
+ 'Acidente por animal peçonhento':['Ficha de Investigação – Acidentes por Animais Peçonhentos'],
+ 'Acidente por animal potencialmente transmissor da raiva (atendimento antirrábico)':['Ficha de Investigação – Atendimento Antirrábico Humano'],
+ 'Anomalias congênitas':['Declaração de Nascido Vivo (SINASC)','outro'],
+ 'Botulismo':['Ficha de Investigação – Botulismo'],
+ 'Câncer relacionado ao trabalho':['Ficha de Investigação – Câncer Relacionado ao Trabalho'],
+ 'Cólera':['Ficha de Investigação – Cólera'],
+ 'Coqueluche':['Ficha de Investigação – Coqueluche'],
+ 'Covid-19':['e-SUS Notifica (síndrome gripal) / SIVEP-Gripe (SRAG)','outro'],
+ 'Dengue':['Ficha de Investigação – Dengue e Febre de Chikungunya'],
+ 'Dengue – óbito':['Ficha de Investigação – Dengue e Febre de Chikungunya'],
+ 'Febre de chikungunya':['Ficha de Investigação – Dengue e Febre de Chikungunya'],
+ 'Febre de chikungunya em áreas sem transmissão':['Ficha de Investigação – Dengue e Febre de Chikungunya'],
+ 'Óbito com suspeita de febre de chikungunya':['Ficha de Investigação – Dengue e Febre de Chikungunya'],
+ 'Dermatoses ocupacionais':['Ficha de Investigação – Dermatoses Ocupacionais'],
+ 'Difteria':['Ficha de Investigação – Difteria'],
+ 'Doença de Chagas aguda':['Ficha de Investigação – Doença de Chagas Aguda'],
+ 'Doença invasiva por Haemophilus influenzae':['Ficha de Investigação – Meningite'],
+ 'Doença meningocócica e outras meningites':['Ficha de Investigação – Meningite'],
+ 'Síndrome congênita associada à infecção pelo vírus Zika':['Registro de Eventos em Saúde Pública (RESP)','outro'],
+ 'Doenças exantemáticas: sarampo':['Ficha de Investigação – Doenças Exantemáticas Febris (Sarampo/Rubéola)'],
+ 'Doenças exantemáticas: rubéola':['Ficha de Investigação – Doenças Exantemáticas Febris (Sarampo/Rubéola)'],
+ 'Esquistossomose':['Ficha de Investigação – Esquistossomose'],
+ 'Eventos supostamente atribuíveis à vacinação ou imunização (ESAVI) graves ou óbitos':['e-SUS Notifica (ESAVI)','outro'],
+ 'Febre amarela':['Ficha de Investigação – Febre Amarela'],
+ 'Febre do Nilo Ocidental e outras arboviroses de importância em saúde pública':['Ficha de Investigação – Febre do Nilo Ocidental'],
+ 'Febre maculosa e outras riquetsioses':['Ficha de Investigação – Febre Maculosa/Rickettsioses'],
+ 'Febre tifoide':['Ficha de Investigação – Febre Tifoide'],
+ 'Hanseníase':['Ficha de Notificação/Investigação – Hanseníase'],
+ 'Hantavirose':['Ficha de Investigação – Hantavirose'],
+ 'Hepatites virais':['Ficha de Investigação – Hepatites Virais'],
+ 'Hepatite B em gestante, parturiente ou puérpera e criança exposta':['Ficha de Investigação – Hepatites Virais'],
+ 'HIV/aids – infecção pelo HIV ou doença causada pelo HIV':['Ficha de Investigação – HIV/Aids (adulto ou criança)'],
+ 'Infecção pelo HIV em gestante, parturiente ou puérpera e criança exposta ao risco de transmissão vertical':['Ficha de Investigação – Gestante HIV / Criança Exposta'],
+ 'Intoxicação exógena (substâncias químicas, agrotóxicos, gases tóxicos e metais pesados)':['Ficha de Investigação – Intoxicação Exógena'],
+ 'Leishmaniose tegumentar americana':['Ficha de Investigação – Leishmaniose Tegumentar Americana'],
+ 'Leishmaniose visceral':['Ficha de Investigação – Leishmaniose Visceral'],
+ 'Leptospirose':['Ficha de Investigação – Leptospirose'],
+ 'LER/DORT – lesões por esforços repetitivos e distúrbios osteomusculares relacionados ao trabalho':['Ficha de Investigação – LER/DORT'],
+ 'Malária na região amazônica':['SIVEP-Malária','outro'],
+ 'Malária na região extra-amazônica':['Ficha de Investigação – Malária'],
+ 'Óbito infantil':['Declaração de Óbito (SIM) e ficha de investigação do óbito','outro'],
+ 'Óbito materno':['Declaração de Óbito (SIM) e ficha de investigação do óbito','outro'],
+ 'Perda auditiva induzida por ruído (PAIR) relacionada ao trabalho':['Ficha de Investigação – PAIR'],
+ 'Peste':['Ficha de Investigação – Peste'],
+ 'Pneumoconioses relacionadas ao trabalho':['Ficha de Investigação – Pneumoconioses'],
+ 'Poliomielite por poliovírus selvagem':['Ficha de Investigação – Paralisia Flácida Aguda/Poliomielite'],
+ 'Síndrome da paralisia flácida aguda':['Ficha de Investigação – Paralisia Flácida Aguda/Poliomielite'],
+ 'Raiva humana':['Ficha de Investigação – Raiva Humana'],
+ 'Síndrome da rubéola congênita':['Ficha de Investigação – Síndrome da Rubéola Congênita'],
+ 'Síndrome respiratória aguda grave (SRAG) associada a coronavírus':['SIVEP-Gripe','outro'],
+ 'Influenza humana produzida por novo subtipo viral':['SIVEP-Gripe / CIEVS','outro'],
+ 'Sífilis adquirida':['Ficha de Investigação – Sífilis Adquirida'],
+ 'Sífilis em gestante':['Ficha de Investigação – Sífilis em Gestante'],
+ 'Sífilis congênita':['Ficha de Investigação – Sífilis Congênita'],
+ 'Tétano acidental':['Ficha de Investigação – Tétano Acidental'],
+ 'Tétano neonatal':['Ficha de Investigação – Tétano Neonatal'],
+ 'Transtornos mentais relacionados ao trabalho':['Ficha de Investigação – Transtornos Mentais Relacionados ao Trabalho'],
+ 'Tuberculose':['Ficha de Notificação/Investigação – Tuberculose'],
+ 'Violência interpessoal/autoprovocada':['Ficha de Notificação Individual – Violência Interpessoal/Autoprovocada'],
+ 'Violência sexual e tentativa de suicídio':['Ficha de Notificação Individual – Violência Interpessoal/Autoprovocada']
+};
+/** Devolve {nome, tipo:'fin'|'especifica'|'outro'|'conf', pronta:bool} */
+function fichaDoAgravo(nome){
+  const f=FICHA_DE[nome];
+  if(!f) return { nome:'Ficha de Notificação Individual (confirmar com a vigilância se há ficha específica)', tipo:'conf', pronta:true };
+  if(f[1]==='outro') return { nome:f[0], tipo:'outro', pronta:false };
+  return { nome:f[0], tipo:'especifica', pronta:!!(typeof FICHAS_PRONTAS!=='undefined' && FICHAS_PRONTAS[f[0]]) };
+}
+
 const OPC = {
   tipo:[['2','Individual']],
   idadeUn:[['1','Hora'],['2','Dia'],['3','Mês'],['4','Ano']],
@@ -534,7 +614,10 @@ function telaNova(){
   (temCad?'':'<div class="aviso">Nenhuma lista de cadastros carregada neste computador. Você pode preencher tudo à mão ou <a href="#" onclick="irAba(\'cadastros\');return false">carregar a lista da UBS</a> para o preenchimento automático.</div>')+
   '<section class="card"><h2>Agravo e notificação</h2>'+
     '<div class="campos">'+
-    campo('agravo','Agravo/doença', '<input id="agravo" list="lAgr" autocomplete="off" placeholder="Digite: dengue, sífilis, violência…" value="'+esc(E.f.agravo||'')+'"><datalist id="lAgr">'+AGRAVOS.map(a=>'<option value="'+esc(a[0])+'">').join('')+'</datalist>', {n:'2', obr:1, cls:'largo'})+
+    '<div class="campo largo"><label for="agrBusca"><span class="n">2</span> Agravo/doença <span class="obr">*</span></label>'+
+      '<input id="agrBusca" type="search" autocomplete="off" placeholder="Filtrar a lista: dengue, sífilis, violência…">'+
+      '<select id="agravo" size="7" class="lista-agr">'+listaAgravos()+'</select>'+
+      '<small>Escolha na lista. Os agravos de notificação imediata aparecem primeiro.</small></div>'+
     campo('cid','Código (CID-10)', inp('cid','text',{max:6}), {ajuda:'Preenchido pelo agravo; confira com a vigilância.'})+
     campo('dataNotif','Data da notificação', inp('dataNotif','date'), {n:'3', obr:1})+
     campo('dataSint','Data dos primeiros sintomas', inp('dataSint','date'), {n:'7', obr:1})+
@@ -586,12 +669,27 @@ function telaNova(){
   ligarEventos();
   avisoAgravo();
 }
+function listaAgravos(filtro){
+  const q=semAcento(filtro||''), ok=a=>!q||q.split(' ').every(p=>semAcento(a[0]+' '+a[1]).indexOf(p)>-1);
+  const ord=(x,y)=>x[0].localeCompare(y[0],'pt');
+  const grupo=(rot,t)=>{ const l=AGRAVOS.filter(a=>a[2]===t&&ok(a)).sort(ord); return l.length?'<optgroup label="'+rot+'">'+l.map(a=>'<option value="'+esc(a[0])+'"'+(E.f.agravo===a[0]?' selected':'')+'>'+esc(a[0])+' · '+a[1]+'</option>').join('')+'</optgroup>':''; };
+  const h=grupo('Notificação imediata (até 24 horas)','I')+grupo('Notificação semanal','S');
+  return h||'<option disabled>Nenhum agravo encontrado</option>';
+}
 function coletar(){ $$('#app input, #app select, #app textarea').forEach(el=>{ if(el.id && el.type!=='checkbox') E.f[el.id]=el.value.trim(); }); return E.f; }
-function agravoAtual(){ const a=semAcento($('#agravo').value); return AGRAVOS.find(x=>semAcento(x[0])===a); }
+function agravoAtual(){ const v=$('#agravo').value; return AGRAVOS.find(x=>x[0]===v); }
 function avisoAgravo(){ const ag=agravoAtual(), box=$('#avisoImediata'); if(!box) return;
-  box.innerHTML = ag && ag[2]==='I' ? '<div class="alerta-im"><b>Notificação imediata (até 24 horas).</b> Além da ficha, comunique a vigilância epidemiológica por telefone assim que houver a suspeita.</div>' : ''; }
+  if(!ag){ box.innerHTML=''; return; }
+  const fi=fichaDoAgravo(ag[0]);
+  box.innerHTML='<div class="ficha-info"><b>Ficha:</b> '+esc(fi.nome)+
+    (fi.tipo==='outro'?'<br>Este agravo é notificado em outro sistema/instrumento. Procure a vigilância epidemiológica.':
+     fi.tipo==='especifica'&&!fi.pronta?'<br><span class="pend">Os campos específicos desta ficha ainda estão sendo incluídos no site. Por enquanto, o PDF traz a parte de notificação (campos 1 a 30); complete a investigação na ficha impressa.</span>':'')+'</div>'+
+    (ag[2]==='I'?'<div class="alerta-im"><b>Notificação imediata (até 24 horas).</b> Além da ficha, comunique a vigilância epidemiológica por telefone assim que houver a suspeita.</div>':''); }
 function ligarEventos(){
-  $('#agravo').addEventListener('input',()=>{ const ag=agravoAtual(); if(ag){ $('#cid').value=ag[1]; } avisoAgravo(); });
+  const escolher=()=>{ const ag=agravoAtual(); if(ag){ E.f.agravo=ag[0]; $('#cid').value=ag[1]; } avisoAgravo(); };
+  $('#agravo').addEventListener('change',escolher);
+  $('#agrBusca').addEventListener('input',e=>{ const s=$('#agravo'); s.innerHTML=listaAgravos(e.target.value); const ops=s.querySelectorAll('option:not([disabled])'); if(ops.length===1){ ops[0].selected=true; escolher(); } });
+  $('#agrBusca').addEventListener('keydown',e=>{ if(e.key==='ArrowDown'){ e.preventDefault(); const s=$('#agravo'); s.focus(); if(s.selectedIndex<0 && s.options.length){ s.selectedIndex=0; escolher(); } } });
   $('#sexo').addEventListener('change',gestanteAuto); $('#nasc').addEventListener('change',gestanteAuto);
   const nome=$('#nome'), sug=$('#sug'); let marc=-1;
   nome.addEventListener('input',()=>{ marc=-1; mostrarSugestoes(nome.value); });
@@ -642,7 +740,7 @@ function aviso(t){ let a=$('#toast'); a.textContent=t; a.classList.add('on'); cl
 /* ---------- validação e geração ---------- */
 function validar(f){
   const falta=[];
-  const ag=AGRAVOS.find(x=>semAcento(x[0])===semAcento(f.agravo));
+  const ag=AGRAVOS.find(x=>x[0]===f.agravo);
   if(!f.agravo) falta.push('2 · Agravo/doença');
   if(!f.dataNotif) falta.push('3 · Data da notificação');
   if(!f.ufNotif) falta.push('4 · UF'); if(!f.munNotif) falta.push('5 · Município de notificação'); if(!f.unidade) falta.push('6 · Unidade de saúde');
@@ -654,6 +752,7 @@ function validar(f){
   if(!f.ufRes) falta.push('17 · UF de residência'); if(!f.munRes) falta.push('18 · Município de residência');
   if(!f.notificante) falta.push('Nome do notificante'); if(!f.funcao) falta.push('Função do notificante');
   const erros=[];
+  if(ag && fichaDoAgravo(ag[0]).tipo==='outro') erros.push('Este agravo é notificado em '+fichaDoAgravo(ag[0]).nome+', e não por esta ficha.');
   if(f.dataSint && f.dataNotif && f.dataSint>f.dataNotif) erros.push('A data dos primeiros sintomas é posterior à data da notificação.');
   if(f.nasc && f.dataSint && f.nasc>f.dataSint) erros.push('A data de nascimento é posterior à data dos primeiros sintomas.');
   if(f.sexo==='M' && f.gestante && f.gestante!=='6') erros.push('Campo 12: para sexo masculino use "6 - Não se aplica".');
