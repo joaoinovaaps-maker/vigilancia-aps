@@ -6,7 +6,8 @@
  * grava na planilha e envia os dados por e-mail ao endereco institucional.
  * Os registros NAO contem dados pessoais do paciente.
  *
- * Instalacao: Planilha > Extensoes > Apps Script > colar este codigo > salvar.
+ * Instalacao: projeto do Apps Script (independente ou vinculado a uma planilha) > colar este codigo > salvar.
+ * Se o projeto for independente, a planilha "Banco OPM - Registros" e criada automaticamente no Drive.
  * Depois: Implantar > Nova implantacao > App da Web
  *         Executar como: Eu | Quem pode acessar: Qualquer pessoa
  */
@@ -86,7 +87,7 @@ function enviarEmailRegistro_(heads, linha, status) {
     '<p><b>' + esc_(status) + '</b> registrada no banco anonimizado de OPM.</p>' +
     '<table style="border-collapse:collapse;font-size:13px">' + tabela + '</table>' +
     '<p style="font-size:12px;color:#777;margin-top:14px">Registro sem dados pessoais do paciente. ' +
-    'Planilha consolidada: <a href="' + SpreadsheetApp.getActiveSpreadsheet().getUrl() + '">abrir</a>.</p></div>';
+    'Planilha consolidada: <a href="' + planilha_().getUrl() + '">abrir</a>.</p></div>';
 
   const opcoes = { to: CONFIG.EMAIL_DESTINO, subject: CONFIG.ASSUNTO_PREFIXO + status + ' - ' + opm + ' - ' + id,
     htmlBody: html, name: CONFIG.NOME_REMETENTE };
@@ -104,7 +105,7 @@ function enviarEmailRegistro_(heads, linha, status) {
  * Pode ser executado manualmente ou de forma automatica (ver criarEnvioSemanal).
  */
 function enviarRelatorioConsolidado() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = planilha_();
   const sh = ss.getSheetByName(CONFIG.ABA);
   if (!sh || sh.getLastRow() < 2) { console.log('Sem registros para enviar.'); return; }
 
@@ -148,9 +149,9 @@ function criarEnvioMensal() {
  * Mantem um arquivo "Banco_OPM_atual.csv" (sempre substituido) e um arquivo datado por dia.
  */
 function salvarCopiaNoDrive() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = planilha_();
   const sh = ss.getSheetByName(CONFIG.ABA);
-  if (!sh || sh.getLastRow() < 2) { console.log('Sem registros para salvar.'); return; }
+  if (!sh || sh.getLastRow() < 2) { console.log('Ainda não há registros; a cópia será feita quando houver dados. Pasta: ' + obterPasta_().getUrl()); return; }
   const pasta = obterPasta_();
   const conteudo = '﻿' + sh.getDataRange().getValues().map(function (r) {
     return r.map(function (v) {
@@ -179,8 +180,34 @@ function criarCopiaDiariaNoDrive() {
 /** Move a propria planilha para a pasta do Drive, deixando tudo no mesmo lugar. Execute uma vez. */
 function organizarPlanilhaNaPasta() {
   const pasta = obterPasta_();
-  DriveApp.getFileById(SpreadsheetApp.getActiveSpreadsheet().getId()).moveTo(pasta);
+  DriveApp.getFileById(planilha_().getId()).moveTo(pasta);
   console.log('Planilha movida para: ' + pasta.getUrl());
+}
+
+/**
+ * Retorna a planilha do banco. Funciona tanto com o script vinculado a uma planilha
+ * (Extensoes > Apps Script) quanto com projeto independente: nesse caso, cria
+ * automaticamente a planilha "Banco OPM - Registros" na pasta do Drive e guarda o ID.
+ */
+function planilha_() {
+  const props = PropertiesService.getScriptProperties();
+  const id = props.getProperty('PLANILHA_ID');
+  if (id) {
+    try { return SpreadsheetApp.openById(id); } catch (e) { props.deleteProperty('PLANILHA_ID'); }
+  }
+  const ativa = SpreadsheetApp.getActiveSpreadsheet();
+  if (ativa) { props.setProperty('PLANILHA_ID', ativa.getId()); return ativa; }
+  const nova = SpreadsheetApp.create('Banco OPM - Registros');
+  DriveApp.getFileById(nova.getId()).moveTo(obterPasta_());
+  props.setProperty('PLANILHA_ID', nova.getId());
+  console.log('Planilha criada: ' + nova.getUrl());
+  return nova;
+}
+
+/** Mostra o endereco da planilha e da pasta do Drive. */
+function mostrarLocais() {
+  console.log('Planilha: ' + planilha_().getUrl());
+  console.log('Pasta no Drive: ' + obterPasta_().getUrl());
 }
 
 function obterPasta_() {
@@ -199,13 +226,13 @@ function removerEnvioAutomatico() {
 function testarEmail() {
   MailApp.sendEmail(CONFIG.EMAIL_DESTINO, CONFIG.ASSUNTO_PREFIXO + 'Teste do coletor',
     'O coletor do banco de OPM está configurado corretamente.\nPlanilha: ' +
-    SpreadsheetApp.getActiveSpreadsheet().getUrl());
+    planilha_().getUrl());
   console.log('Cota restante de e-mails hoje: ' + MailApp.getRemainingDailyQuota());
 }
 
 /** Teste completo pelo editor: simula um envio do formulario (grava linha de teste e envia e-mail). */
 function testarRegistro() {
-  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.ABA);
+  const sh = planilha_().getSheetByName(CONFIG.ABA);
   if (!sh || sh.getLastRow() === 0) {
     console.log('A aba "' + CONFIG.ABA + '" ainda não tem cabeçalho. Primeiro implante o App da Web e clique em ' +
       '"Testar" na aba 7 do formulário; depois execute testarRegistro novamente.');
@@ -225,7 +252,7 @@ function testarRegistro() {
 
 // ===================== AUXILIARES =====================
 function obterAba_(heads) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = planilha_();
   const sh = ss.getSheetByName(CONFIG.ABA) || ss.insertSheet(CONFIG.ABA);
   if (sh.getLastRow() === 0 && heads && heads.length) {
     sh.appendRow(heads);
