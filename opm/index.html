@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Formulários OPM</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#f3f5f7;--card:#fff;--tx:#1c2631;--mu:#5a6776;--bd:#d4dbe2;--ac:#0b6e4f;--ac2:#e5f2ec;--wa:#8a5300;--wa2:#fff4e0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12171c;--card:#1b2229;--tx:#e6ebf0;--mu:#9aa7b4;--bd:#2f3a45;--ac:#2fa57c;--ac2:#163a2e;--wa:#f0b35a;--wa2:#2e2416}}
+:root[data-theme="dark"]{--bg:#12171c;--card:#1b2229;--tx:#e6ebf0;--mu:#9aa7b4;--bd:#2f3a45;--ac:#2fa57c;--ac2:#163a2e;--wa:#f0b35a;--wa2:#2e2416}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--ac);color:#fff;padding:18px 16px}
+header h1{margin:0;font-size:20px}
+header p{margin:4px 0 0;opacity:.92;font-size:13px}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:5}
+nav button{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:999px;padding:7px 14px;font:inherit;font-size:13.5px;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+main{max-width:1000px;margin:0 auto;padding:16px}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 12px;font-size:16px}
+.card h3{margin:16px 0 8px;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--mu)}
+.card h3:first-of-type{margin-top:4px}
+.g{display:grid;grid-template-columns:repeat(12,1fr);gap:10px 12px}
+.c1{grid-column:span 1}.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c9{grid-column:span 9}.c12{grid-column:span 12}
+label.f{display:flex;flex-direction:column;font-size:12.5px;color:var(--mu);gap:3px}
+input,select,textarea{font:inherit;font-size:14.5px;color:var(--tx);border:1px solid var(--bd);border-radius:7px;padding:8px 9px;background:var(--card);width:100%}
+textarea{min-height:72px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:3px solid var(--ac2);border-color:var(--ac)}
+.opts{display:flex;flex-wrap:wrap;gap:6px 16px;margin:2px 0 4px}
+.ck{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--tx);cursor:pointer}
+.ck input{width:auto;margin:0;accent-color:var(--ac)}
+.lbl{font-size:12.5px;color:var(--mu);margin:8px 0 2px}
+.hint{font-size:12.5px;color:var(--mu);margin:6px 0 0}
+.warn{background:var(--wa2);color:var(--wa);border-radius:8px;padding:10px 12px;font-size:13.5px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{border:1px solid var(--ac);background:var(--ac);color:#fff;border-radius:8px;padding:9px 15px;font:inherit;font-size:14px;cursor:pointer}
+.btn.sec{background:var(--card);color:var(--ac)}
+.btn.sm{padding:5px 10px;font-size:12.5px}
+details{margin-top:12px;border:1px dashed var(--bd);border-radius:8px;padding:10px 12px}
+summary{cursor:pointer;font-weight:600;font-size:14px}
+ol.steps{margin:6px 0 0;padding-left:20px}ol.steps li{margin:4px 0}
+ul.pend{margin:6px 0 0;padding-left:20px}
+.sec-row{display:grid;grid-template-columns:2fr 5fr 1fr;gap:8px;margin-bottom:8px}
+@media(max-width:700px){.g>*{grid-column:span 12!important}.sec-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Formulários de OPM — Cadeira de Rodas / CER-APAE</h1>
+  <p>Ficha de prescrição · Laudo APAC · Termo sem prova técnica · Autorização de retirada — gera PDF para assinatura digital gov.br</p>
+</header>
+<nav>
+  <button data-t="t1" class="on">1. Paciente</button>
+  <button data-t="t2">2. Prescrição</button>
+  <button data-t="t3">3. Laudo APAC</button>
+  <button data-t="t4">4. Termo s/ prova técnica</button>
+  <button data-t="t5">5. Autorização de retirada</button>
+  <button data-t="t6">6. Gerar PDF</button>
+  <button data-t="t7">7. Banco de dados</button>
+</nav>
+<main>
+<form id="f" onsubmit="return false" autocomplete="off">
+
+<!-- ============ 1. PACIENTE ============ -->
+<section id="t1" class="on">
+  <div class="card">
+    <h2>Identificação do paciente</h2>
+    <p class="hint" style="margin:-6px 0 12px">Estes dados são aproveitados automaticamente nos quatro documentos.</p>
+    <div class="g">
+      <label class="f c8">Nome do paciente *<input name="p_nome"></label>
+      <label class="f c4">Nº do prontuário (4)<input name="p_pront"></label>
+      <label class="f c4">Cartão Nacional de Saúde – CNS (5)<input name="p_cns" data-mask="cns" inputmode="numeric"></label>
+      <label class="f c4">CPF<input name="p_cpf" data-mask="cpf" inputmode="numeric"></label>
+      <label class="f c4">RG<input name="p_rg"></label>
+      <label class="f c3">Data de nascimento (6)<input type="date" name="p_nasc"></label>
+      <label class="f c2">Idade<input name="p_idade" inputmode="numeric"></label>
+      <label class="f c3">Sexo (7)<select name="p_sexo"><option value=""></option><option value="M">Masculino</option><option value="F">Feminino</option></select></label>
+      <label class="f c4">Raça/cor (8)<select name="p_raca"><option value=""></option><option>Branca</option><option>Preta</option><option>Parda</option><option>Amarela</option><option>Indígena</option><option>Sem informação</option></select></label>
+      <label class="f c2">Peso (kg)<input name="p_peso" inputmode="decimal"></label>
+      <label class="f c2">Altura (m)<input name="p_altura" inputmode="decimal" placeholder="1,65"></label>
+      <label class="f c8">Nome da mãe (9)<input name="p_mae"></label>
+      <label class="f c4">Telefone 1 (10)<input name="p_tel1" data-mask="tel" inputmode="tel"></label>
+      <label class="f c4">Telefone 2<input name="p_tel2" data-mask="tel" inputmode="tel"></label>
+      <label class="f c4">Telefone 3<input name="p_tel3" data-mask="tel" inputmode="tel"></label>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Endereço</h2>
+    <div class="g">
+      <label class="f c8">Endereço — rua, nº (13)<input name="p_end"></label>
+      <label class="f c4">Bairro<input name="p_bairro"></label>
+      <label class="f c5">Município de residência (14)<input name="p_mun" value="Dourados"></label>
+      <label class="f c3">Cód. IBGE município (15)<input name="p_ibge" value="5003702" data-mask="num" inputmode="numeric"></label>
+      <label class="f c1">UF (16)<input name="p_uf" value="MS" maxlength="2"></label>
+      <label class="f c3">CEP (17)<input name="p_cep" data-mask="cep" inputmode="numeric"></label>
+      <label class="f c6">Equipe de referência (ESF)<select name="p_esf"><option value=""></option><option>ESF 59 - Ipê Rosa</option><option>ESF 60 - Ipê Amarelo</option><option>ESF 61 - Ipê Branco</option><option>Outra unidade</option></select></label>
+    </div>
+    <input type="hidden" name="reg_id">
+  </div>
+  <div class="card">
+    <h2>Responsável pelo paciente <span style="font-weight:400;color:var(--mu);font-size:13px">(se houver)</span></h2>
+    <div class="g">
+      <label class="f c6">Nome do responsável (11)<input name="r_nome"></label>
+      <label class="f c3">CPF<input name="r_cpf" data-mask="cpf" inputmode="numeric"></label>
+      <label class="f c3">RG<input name="r_rg"></label>
+      <label class="f c4">Telefone do responsável (12)<input name="r_tel" data-mask="tel" inputmode="tel"></label>
+    </div>
+    <p class="hint">Se preenchido, o responsável assina o Termo sem prova técnica. Se vazio, assina o próprio paciente.</p>
+  </div>
+  <div class="card" data-keep>
+    <h2>Profissional solicitante, estabelecimento e data</h2>
+    <p class="hint" style="margin:-6px 0 12px">Estes campos são mantidos ao iniciar um novo paciente.</p>
+    <div class="g">
+      <label class="f c6">Nome do profissional (41)<input name="prof_nome"></label>
+      <div class="c2"><div class="lbl">Documento (43)</div><div class="opts">
+        <label class="ck"><input type="radio" name="prof_doctipo" value="CNS" checked>CNS</label>
+        <label class="ck"><input type="radio" name="prof_doctipo" value="CPF">CPF</label></div></div>
+      <label class="f c4">Nº do documento (44)<input name="prof_doc" data-mask="num" inputmode="numeric"></label>
+      <label class="f c4">Registro no conselho<input name="prof_reg" placeholder="Ex.: CREFITO-13 000000-F"></label>
+      <label class="f c4">Data dos documentos / solicitação (42)<input type="date" name="doc_data"></label>
+      <div class="c4"></div>
+      <label class="f c8">Estabelecimento de saúde solicitante (1)<input name="est_nome" value="SECRETARIA MUNICIPAL DE SAÚDE DE DOURADOS"></label>
+      <label class="f c4">CNES (2)<input name="est_cnes" value="6548385" data-mask="num" inputmode="numeric"></label>
+    </div>
+  </div>
+  <div class="row"><button type="button" class="btn" data-go="t2">Próximo: Prescrição →</button></div>
+</section>
+
+<!-- ============ 2. PRESCRIÇÃO ============ -->
+<section id="t2">
+  <div class="card">
+    <h2>Ficha de prescrição — especificações de cadeiras de rodas</h2>
+    <h3>Patologia</h3>
+    <div class="g">
+      <label class="f c8">Etiologia<input name="rx_etiol"></label>
+      <label class="f c4">Tempo de deficiência<input name="rx_tempo"></label>
+    </div>
+    <div class="opts" style="margin-top:10px">
+      <label class="ck"><input type="checkbox" name="rx_pat" value="Tetraplegia">Tetraplegia</label>
+      <label class="ck"><input type="checkbox" name="rx_pat" value="Paraplegia">Paraplegia</label>
+      <label class="ck"><input type="checkbox" name="rx_pat" value="Hemiplegia">Hemiplegia</label>
+      <label class="ck"><input type="checkbox" name="rx_pat" value="Amputação">Amputação</label>
+      <label class="ck"><input type="checkbox" name="rx_pat" value="Paralisia Cerebral">Paralisia Cerebral</label>
+      <label class="ck"><input type="checkbox" name="rx_pat" value="Senilidade">Senilidade</label>
+    </div>
+    <h3>Medidas do usuário (cm)</h3>
+    <div class="g">
+      <label class="f c4">Largura do assento (A)<input name="rx_larg" inputmode="decimal"></label>
+      <label class="f c4">Comprimento do assento (B)<input name="rx_comp" inputmode="decimal"></label>
+      <label class="f c4">Altura do encosto (C)<input name="rx_alt" inputmode="decimal"></label>
+    </div>
+    <p class="hint">A: maior largura do quadril sentado · B: da região posterior do quadril até a fossa poplítea · C: do assento até a altura desejada do encosto.</p>
+    <h3>Especificações da cadeira</h3>
+    <div class="lbl">Estrutura/quadro</div>
+    <div class="opts">
+      <label class="ck"><input type="checkbox" name="rx_quadro" value="adulto">Adulto</label>
+      <label class="ck"><input type="checkbox" name="rx_quadro" value="infantil">Infantil</label>
+    </div>
+    <div class="opts">
+      <label class="ck"><input type="checkbox" name="rx_tipo" value='Dobrável em "X"'>Dobrável em "X"</label>
+      <label class="ck"><input type="checkbox" name="rx_tipo" value="Monobloco">Monobloco</label>
+      <label class="ck"><input type="checkbox" name="rx_tipo" value="Postural com tilt e/ou reclínio">Postural com tilt e/ou reclínio</label>
+      <label class="ck"><input type="checkbox" name="rx_tipo" value="Postural com reclínio de encosto">Postural com reclínio de encosto</label>
+    </div>
+    <div class="lbl">Características de modelos e rodas</div>
+    <div class="opts">
+      <label class="ck"><input type="checkbox" name="rx_modelo" value="Motorizada">Motorizada</label>
+      <label class="ck"><input type="checkbox" name="rx_modelo" value="Obeso">Obeso</label>
+      <label class="ck"><input type="checkbox" name="rx_modelo" value="Padrão Adulto">Padrão Adulto</label>
+      <label class="ck"><input type="checkbox" name="rx_modelo" value="Padrão Infantil">Padrão Infantil</label>
+    </div>
+    <div class="g">
+      <div class="c6"><div class="lbl">Rodas dianteiras</div><div class="opts">
+        <label class="ck"><input type="checkbox" name="rx_rodad" value="maciças">Maciças</label>
+        <label class="ck"><input type="checkbox" name="rx_rodad" value="infláveis">Infláveis</label></div></div>
+      <div class="c6"><div class="lbl">Rodas traseiras</div><div class="opts">
+        <label class="ck"><input type="checkbox" name="rx_rodat" value="maciças">Maciças</label>
+        <label class="ck"><input type="checkbox" name="rx_rodat" value="infláveis">Infláveis</label></div></div>
+      <div class="c8"><div class="lbl">Habilidade do usuário</div><div class="opts" style="flex-direction:column">
+        <label class="ck"><input type="checkbox" name="rx_hab" value="plena">Condição plena de impulsionar a cadeira</label>
+        <label class="ck"><input type="checkbox" name="rx_hab" value="limitada">Condição limitada de impulsionar a cadeira</label>
+        <label class="ck"><input type="checkbox" name="rx_hab" value="terceiros">Necessita de terceiros para deslocamento</label></div></div>
+      <div class="c4"><div class="lbl">Aro de propulsão</div><div class="opts">
+        <label class="ck"><input type="checkbox" name="rx_aro" value="Liso">Liso</label>
+        <label class="ck"><input type="checkbox" name="rx_aro" value="Com pino">Com pino</label></div></div>
+    </div>
+    <div class="lbl">Contenção e acessórios <span style="font-size:11.5px">(* não disponível para todos os modelos)</span></div>
+    <div class="opts">
+      <label class="ck"><input type="checkbox" name="rx_cont" value="Com apoio de cabeça">Com apoio de cabeça</label>
+      <label class="ck"><input type="checkbox" name="rx_cont" value="Cinto pélvico">Cinto pélvico</label>
+      <label class="ck"><input type="checkbox" name="rx_cont" value="Cinto torácico*">Cinto torácico*</label>
+      <label class="ck"><input type="checkbox" name="rx_cont" value="Cinto pélvico em Y*">Cinto pélvico em Y*</label>
+      <label class="ck"><input type="checkbox" name="rx_cont" value="Rodas antitombo*">Rodas antitombo*</label>
+      <label class="ck"><input type="checkbox" name="rx_cont" value="Mesa de atividades*">Mesa de atividades*</label>
+    </div>
+    <div class="lbl">Controle da motorizada</div>
+    <div class="opts">
+      <label class="ck"><input type="checkbox" name="rx_ctrl" value="lado direito">Lado direito</label>
+      <label class="ck"><input type="checkbox" name="rx_ctrl" value="lado esquerdo">Lado esquerdo</label>
+    </div>
+    <div class="lbl">Cores <span style="font-size:11.5px">(não disponível para todos os modelos)</span></div>
+    <div class="opts" id="cores"></div>
+    <h3>Observações</h3>
+    <textarea name="rx_obs"></textarea>
+  </div>
+  <div class="row"><button type="button" class="btn sec" data-go="t1">← Paciente</button><button type="button" class="btn" data-go="t3">Próximo: Laudo APAC →</button></div>
+</section>
+
+<!-- ============ 3. LAUDO APAC ============ -->
+<section id="t3">
+  <div class="card">
+    <h2>Laudo para solicitação/autorização de procedimento ambulatorial</h2>
+    <p class="hint" style="margin:-6px 0 12px">Campos 1 a 17 e 41 a 44 vêm da aba “Paciente”.</p>
+    <h3>Procedimento solicitado</h3>
+    <div class="g">
+      <label class="f c3">18 - Código do procedimento principal<input name="l_cod" data-mask="sigtap" inputmode="numeric" placeholder="00.00.00.000-0"></label>
+      <label class="f c7">19 - Nome do procedimento principal<input name="l_proc"></label>
+      <label class="f c2">20 - Qtde.<input name="l_qtd" value="1" inputmode="numeric"></label>
+    </div>
+    <h3>Procedimento(s) secundário(s)</h3>
+    <div id="secs"></div>
+    <h3>Justificativa do(s) procedimento(s) solicitado(s)</h3>
+    <div class="g">
+      <label class="f c12">36 - Descrição do diagnóstico<textarea name="l_diag" style="min-height:56px"></textarea></label>
+      <label class="f c4">37 - CID-10 principal<input name="l_cid1" style="text-transform:uppercase"></label>
+      <label class="f c4">38 - CID-10 secundário<input name="l_cid2" style="text-transform:uppercase"></label>
+      <label class="f c4">39 - CID-10 causas associadas<input name="l_cid3" style="text-transform:uppercase"></label>
+      <label class="f c12">40 - Observações<textarea name="l_obs">Solicitação de OPM de acordo com as portarias GM 1272 de 25/06/2013 e GM 2723 de 09/12/2014</textarea></label>
+    </div>
+    <p class="hint">45 - Assinatura e carimbo: espaço reservado no PDF para a assinatura digital gov.br do profissional.</p>
+    <details>
+      <summary>Autorização e estabelecimento executante (campos 46–55 — uso do autorizador, opcional)</summary>
+      <div class="g" style="margin-top:10px">
+        <label class="f c8">46 - Nome do profissional autorizador<input name="l_aut_nome"></label>
+        <label class="f c4">47 - Cód. órgão emissor<input name="l_aut_org"></label>
+        <div class="c3"><div class="lbl">48 - Documento</div><div class="opts">
+          <label class="ck"><input type="radio" name="l_aut_doctipo" value="CNS">CNS</label>
+          <label class="ck"><input type="radio" name="l_aut_doctipo" value="CPF">CPF</label></div></div>
+        <label class="f c5">49 - Nº documento do autorizador<input name="l_aut_doc" data-mask="num" inputmode="numeric"></label>
+        <label class="f c4">50 - Data da autorização<input type="date" name="l_aut_data"></label>
+        <label class="f c4">52 - Nº da autorização (APAC)<input name="l_apac"></label>
+        <label class="f c4">53 - Validade da APAC — início<input type="date" name="l_val_ini"></label>
+        <label class="f c4">53 - Validade da APAC — fim<input type="date" name="l_val_fim"></label>
+        <label class="f c8">54 - Nome fantasia do estabelecimento executante<input name="l_exec_nome" placeholder="Ex.: CER/APAE Campo Grande"></label>
+        <label class="f c4">55 - CNES executante<input name="l_exec_cnes" data-mask="num" inputmode="numeric"></label>
+      </div>
+      <p class="hint">51 - Assinatura e carimbo do autorizador: espaço reservado no PDF.</p>
+    </details>
+  </div>
+  <div class="row"><button type="button" class="btn sec" data-go="t2">← Prescrição</button><button type="button" class="btn" data-go="t4">Próximo: Termo →</button></div>
+</section>
+
+<!-- ============ 4. TERMO SEM PROVA TÉCNICA ============ -->
+<section id="t4">
+  <div class="card">
+    <h2>Termo de autorização sem a prova técnica</h2>
+    <p class="hint" style="margin:-6px 0 12px">Assinante: <b id="t_quem">—</b> (nome, CPF, RG e telefone vêm da aba “Paciente”).</p>
+    <div class="g">
+      <label class="f c12">Autorizo o ato da retirada do equipamento
+        <input name="t_equip"></label>
+      <div class="c12" style="margin-top:-4px"><button type="button" class="btn sec sm" id="cpEquip">Usar procedimento do laudo (19)</button></div>
+      <label class="f c12">Procedimento<input name="t_proc"></label>
+      <label class="f c12">Motivo (sem a devida prova técnica)<textarea name="t_motivo"></textarea></label>
+    </div>
+  </div>
+  <div class="row"><button type="button" class="btn sec" data-go="t3">← Laudo</button><button type="button" class="btn" data-go="t5">Próximo: Autorização de retirada →</button></div>
+</section>
+
+<!-- ============ 5. AUTORIZAÇÃO DE RETIRADA ============ -->
+<section id="t5">
+  <div class="card">
+    <h2>Autorização para retirada de OPM</h2>
+    <div class="lbl">Retirada de</div>
+    <div class="opts">
+      <label class="ck"><input type="checkbox" name="a_tipo" value="cadeira">Cadeiras de roda e/ou banho</label>
+      <label class="ck"><input type="checkbox" name="a_tipo" value="orteses">Órteses e próteses</label>
+      <label class="ck"><input type="checkbox" name="a_tipo" value="bengala">Bengala/muleta/andador</label>
+    </div>
+    <div class="lbl">Quem autoriza (declarante)</div>
+    <div class="opts">
+      <label class="ck"><input type="radio" name="a_decl" value="usuario" checked>O próprio usuário</label>
+      <label class="ck"><input type="radio" name="a_decl" value="responsavel">Responsável pelo paciente</label>
+    </div>
+    <p class="hint">Dados do declarante vêm da aba “Paciente” (paciente ou responsável).</p>
+    <h3>Pessoa autorizada a retirar</h3>
+    <div class="g">
+      <label class="f c6">Nome do(a) autorizado(a)<input name="a_nome"></label>
+      <label class="f c3">RG nº<input name="a_rg"></label>
+      <label class="f c3">CPF<input name="a_cpf" data-mask="cpf" inputmode="numeric"></label>
+    </div>
+    <p class="hint">Se for motorista da Secretaria, deve constar o nome dele como autorizado. O autorizado apresenta cópias do RG e CPF.</p>
+    <h3>OPM(s) relacionadas</h3>
+    <textarea name="a_opms" placeholder="Uma OPM por linha"></textarea>
+    <div class="row" style="margin-top:6px"><button type="button" class="btn sec sm" id="cpOpms">Preencher com os procedimentos do laudo</button></div>
+    <div class="g" style="margin-top:10px">
+      <label class="f c6">Local<input name="a_local" value="Campo Grande (MS)"></label>
+    </div>
+  </div>
+  <div class="row"><button type="button" class="btn sec" data-go="t4">← Termo</button><button type="button" class="btn" data-go="t6">Próximo: Gerar PDF →</button></div>
+</section>
+
+<!-- ============ 6. GERAR PDF ============ -->
+<section id="t6">
+  <div class="card">
+    <h2>Gerar PDF</h2>
+    <div id="pend"></div>
+    <label class="ck" style="margin-top:12px"><input type="checkbox" id="autoReg" checked>Registrar a solicitação no banco de dados anonimizado ao gerar o PDF</label>
+    <div class="row">
+      <button type="button" class="btn" data-pdf="presc,laudo,termo,aut">PDF completo (4 documentos)</button>
+      <button type="button" class="btn sec" data-pdf="presc,laudo">PDF do profissional (Prescrição + Laudo)</button>
+      <button type="button" class="btn sec" data-pdf="termo,aut">PDF do paciente/responsável (Termo + Autorização)</button>
+    </div>
+    <h3 style="margin-top:20px">Seleção personalizada</h3>
+    <div class="opts">
+      <label class="ck"><input type="checkbox" class="sel" value="presc" checked>Ficha de prescrição</label>
+      <label class="ck"><input type="checkbox" class="sel" value="laudo" checked>Laudo APAC</label>
+      <label class="ck"><input type="checkbox" class="sel" value="termo">Termo sem prova técnica</label>
+      <label class="ck"><input type="checkbox" class="sel" value="aut">Autorização de retirada</label>
+    </div>
+    <div class="row">
+      <button type="button" class="btn sec" id="gSel">Baixar selecionados</button>
+      <button type="button" class="btn sec" id="vSel">Pré-visualizar</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Assinatura digital pelo gov.br</h2>
+    <ol class="steps">
+      <li>Baixe o PDF. Recomenda-se gerar um arquivo por assinante: <b>profissional</b> (Prescrição + Laudo) e <b>paciente/responsável</b> (Termo + Autorização).</li>
+      <li>Acesse <b>assinador.iti.gov.br</b> e entre com a conta gov.br (nível <b>prata ou ouro</b>).</li>
+      <li>Envie o PDF, posicione a assinatura sobre a linha correspondente e confirme com o código enviado ao celular.</li>
+      <li>Baixe o arquivo assinado. Se o mesmo documento precisar de mais de uma assinatura, o arquivo já assinado é enviado novamente ao assinador pela próxima pessoa.</li>
+      <li>Para conferir: <b>validar.iti.gov.br</b>.</li>
+    </ol>
+    <p class="hint">Se o paciente não tiver conta gov.br prata/ouro, imprima o Termo e a Autorização para assinatura manual.</p>
+  </div>
+  <div class="card">
+    <h2>Dados e privacidade</h2>
+    <p class="hint" style="margin-top:0">Os dados ficam apenas neste navegador (rascunho salvo automaticamente) e não são enviados a nenhum servidor. Após gerar os PDFs, use “Novo paciente” para apagar os dados — principalmente em computadores compartilhados.</p>
+    <div class="row"><button type="button" class="btn sec" id="novo">Novo paciente (limpar dados)</button></div>
+  </div>
+</section>
+
+<!-- ============ 7. BANCO DE DADOS ============ -->
+<section id="t7">
+  <div class="card">
+    <h2>Banco de dados anonimizado das solicitações de OPM</h2>
+    <p class="hint" style="margin:-6px 0 10px">Cada solicitação gera um registro <b>sem dados pessoais do paciente</b>: não entram nome, CPF, RG, CNS, prontuário, data de nascimento, filiação, endereço, CEP, telefones, responsável, autorizado, nº da APAC nem textos livres de observação. São registrados: OPM solicitada (código, nome e quantidade), medidas e especificações da cadeira, perfil clínico (patologia, etiologia, CID-10), perfil demográfico agregado (sexo, idade, faixa etária, raça/cor, peso, altura, IMC), território (município, bairro, ESF), profissional solicitante e datas do fluxo.</p>
+    <div class="row" style="margin-top:0">
+      <button type="button" class="btn" id="regAgora">Registrar a solicitação atual</button>
+      <button type="button" class="btn sec" id="expCsv">Exportar planilha (CSV para Excel/Google Planilhas)</button>
+      <button type="button" class="btn sec" id="sync">Reenviar todos à planilha online</button>
+      <button type="button" class="btn sec" id="limpaDb">Apagar banco deste navegador</button>
+    </div>
+    <p class="hint" id="dbStatus"></p>
+  </div>
+  <div class="card">
+    <h2>Resumo</h2>
+    <div id="dbResumo"></div>
+  </div>
+  <div class="card">
+    <h2>Últimos registros</h2>
+    <div id="dbLista" style="overflow-x:auto"></div>
+  </div>
+  <div class="card">
+    <h2>Envio automático ao Google Planilhas (opcional)</h2>
+    <p class="hint" style="margin-top:0">Com a URL configurada, cada registro é enviado também para uma planilha online, consolidando as solicitações de todos os computadores da unidade.</p>
+    <div class="g" style="margin-top:8px">
+      <label class="f c9">URL do App da Web (Apps Script)<input id="gsUrl" placeholder="https://script.google.com/macros/s/.../exec"></label>
+      <div class="c3" style="display:flex;align-items:flex-end;gap:6px"><button type="button" class="btn sm" id="gsSalvar">Salvar</button><button type="button" class="btn sec sm" id="gsTeste">Testar</button></div>
+    </div>
+    <details>
+      <summary>Como configurar (uma única vez, ~5 minutos)</summary>
+      <ol class="steps">
+        <li>Crie uma planilha no Google Planilhas (ex.: “Banco OPM – UBS”).</li>
+        <li>Menu <b>Extensões › Apps Script</b>. Apague o conteúdo e cole o código abaixo.</li>
+        <li>No início do código, em <b>EMAIL_DESTINO</b>, informe o e-mail institucional (vários: separe por vírgula). Salve.</li>
+        <li>Selecione a função <b>testarEmail</b> e clique em <b>Executar</b> para autorizar o envio de e-mails. <b>Não execute a função doPost pelo editor</b>: ela só funciona quando recebe dados do formulário. Opcional: execute <b>criarEnvioSemanal</b> ou <b>criarEnvioMensal</b> para receber a planilha completa (XLSX) com resumo.</li>
+        <li>Armazenamento no Drive: execute <b>organizarPlanilhaNaPasta</b> (move a planilha para a pasta “Banco OPM - dados anonimizados”) e <b>criarCopiaDiariaNoDrive</b> (salva uma cópia CSV diária na mesma pasta).</li>
+        <li><b>Implantar › Nova implantação</b> › tipo <b>App da Web</b>. Executar como: <b>Eu</b>. Quem pode acessar: <b>Qualquer pessoa</b>. Autorize.</li>
+        <li>Copie a URL terminada em <b>/exec</b>, cole no campo acima e clique em <b>Salvar</b> e depois em <b>Testar</b>. A aba “Registros OPM” será criada na planilha.</li>
+      </ol>
+      <textarea id="gsCode" readonly style="min-height:240px;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;margin-top:8px"></textarea>
+      <div class="row"><button type="button" class="btn sec sm" id="gsCopiar">Copiar código</button></div>
+      <p class="hint">Registros com o mesmo ID são atualizados, sem duplicar linhas. A URL deve ser compartilhada apenas com a equipe.</p>
+    </details>
+  </div>
+</section>
+</form>
+</main>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const CORES=['Preto','Prateado','Azul','Rosa','Amarelo','Vermelho','Verde Folha','Névoa Multicolor','Azul marinho','Violeta','Amarelo Fluor','Vermelho pimenta','Verde oliva'];
+$('#cores').innerHTML=CORES.map(c=>`<label class="ck"><input type="checkbox" name="rx_cor" value="${c}">${c}</label>`).join('');
+$('#secs').innerHTML=[1,2,3,4,5].map(i=>{const n=18+i*3;return `<div class="sec-row">
+<label class="f">${n} - Código<input name="l_s${i}c" data-mask="sigtap" inputmode="numeric" placeholder="00.00.00.000-0"></label>
+<label class="f">${n+1} - Nome do procedimento secundário<input name="l_s${i}n"></label>
+<label class="f">${n+2} - Qtde.<input name="l_s${i}q" inputmode="numeric"></label></div>`}).join('');
+
+/* ---------- navegação ---------- */
+function show(t){$$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$$('section').forEach(s=>s.classList.toggle('on',s.id===t));if(t==='t6')pendencias();if(t==='t4')quem();if(t==='t7')renderDb();window.scrollTo(0,0);}
+$$('nav button').forEach(b=>b.onclick=()=>show(b.dataset.t));
+$$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+
+/* ---------- máscaras ---------- */
+const masks={
+ cpf:v=>v.replace(/\D/g,'').slice(0,11).replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'),
+ cns:v=>v.replace(/\D/g,'').slice(0,15).replace(/(\d{3})(\d)/,'$1 $2').replace(/(\d{4})(\d)/,'$1 $2').replace(/(\d{4})(\d)/,'$1 $2'),
+ tel:v=>{const d=v.replace(/\D/g,'').slice(0,11);if(!d)return'';if(d.length<=2)return'('+d;if(d.length<=6)return`(${d.slice(0,2)}) ${d.slice(2)}`;if(d.length<=10)return`(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;return`(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;},
+ cep:v=>v.replace(/\D/g,'').slice(0,8).replace(/(\d{5})(\d)/,'$1-$2'),
+ sigtap:v=>{const d=v.replace(/\D/g,'').slice(0,10);let o='';[2,2,2,3,1].reduce((p,n,i)=>{const s=d.slice(p,p+n);if(s)o+=(i===0?'':i===4?'-':'.')+s;return p+n},0);return o;},
+ num:v=>v.replace(/\D/g,'')
+};
+
+/* ---------- leitura de valores ---------- */
+function A(n){return $$(`#f [name="${n}"]`).filter(e=>e.checked).map(e=>e.value);}
+function V(n){const els=$$(`#f [name="${n}"]`);if(!els.length)return'';const e=els[0];if(e.type==='checkbox'||e.type==='radio')return A(n).join(', ');return e.value.trim();}
+function fd(s){if(!s)return'';const[a,m,d]=s.split('-');return`${d}/${m}/${a}`;}
+function calcIdade(){const n=V('p_nasc');if(!n)return;const b=new Date(n+'T12:00:00'),t=new Date();let i=t.getFullYear()-b.getFullYear();if(t.getMonth()<b.getMonth()||(t.getMonth()===b.getMonth()&&t.getDate()<b.getDate()))i--;if(i>=0&&i<130)$('[name="p_idade"]').value=i;}
+function quem(){const r=V('r_nome');$('#t_quem').textContent=r?`${r} (responsável)`:(V('p_nome')?`${V('p_nome')} (próprio paciente)`:'—');}
+
+/* ---------- rascunho local ---------- */
+const KEY='opm_cer_form_v1';
+function save(){try{const o={};$$('#f [name]').forEach(e=>{if(e.type==='checkbox'||e.type==='radio'){o[e.name]=o[e.name]||[];if(e.checked)o[e.name].push(e.value)}else o[e.name]=e.value});localStorage.setItem(KEY,JSON.stringify(o))}catch(_){}}
+function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||'null');if(!o)return;$$('#f [name]').forEach(e=>{if(!(e.name in o))return;if(e.type==='checkbox'||e.type==='radio')e.checked=o[e.name].includes(e.value);else e.value=o[e.name]})}catch(_){}}
+document.addEventListener('input',e=>{const m=e.target.dataset&&e.target.dataset.mask;if(m){e.target.value=masks[m](e.target.value)}if(e.target.name==='p_nasc')calcIdade();save();});
+document.addEventListener('change',save);
+const hoje=()=>{const t=new Date();return new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+$('#novo').onclick=()=>{if(!confirm('Apagar os dados do paciente e dos documentos? Profissional e estabelecimento serão mantidos.'))return;$$('#f [name]').forEach(e=>{if(e.closest('[data-keep]'))return;if(e.type==='checkbox'||e.type==='radio')e.checked=e.defaultChecked;else e.value=e.defaultValue});$('[name="doc_data"]').value=hoje();save();show('t1');};
+$('#cpEquip').onclick=()=>{$('[name="t_equip"]').value=V('l_proc');save();};
+$('#cpOpms').onclick=()=>{const l=[];if(V('l_proc'))l.push(V('l_proc')+(V('l_qtd')?` (qtde. ${V('l_qtd')})`:''));for(let i=1;i<=5;i++)if(V(`l_s${i}n`))l.push(V(`l_s${i}n`)+(V(`l_s${i}q`)?` (qtde. ${V(`l_s${i}q`)})`:''));$('[name="a_opms"]').value=l.join('\n');save();};
+
+/* ---------- pendências ---------- */
+function pendencias(){
+ const req=[['p_nome','Nome do paciente'],['p_cns','CNS do paciente'],['p_nasc','Data de nascimento'],['p_sexo','Sexo'],['p_mae','Nome da mãe'],['p_end','Endereço'],['rx_larg','Largura do assento'],['rx_comp','Comprimento do assento'],['rx_alt','Altura do encosto'],['l_cod','Código do procedimento principal (18)'],['l_proc','Nome do procedimento principal (19)'],['l_diag','Descrição do diagnóstico (36)'],['l_cid1','CID-10 principal (37)'],['prof_nome','Profissional solicitante'],['doc_data','Data dos documentos']];
+ const f=req.filter(([n])=>!V(n)).map(([,l])=>l);
+ $('#pend').innerHTML=f.length?`<div class="warn"><b>Campos importantes em branco:</b><ul class="pend">${f.map(x=>`<li>${x}</li>`).join('')}</ul><span style="font-size:12.5px">É possível gerar mesmo assim; os campos sairão em branco no PDF.</span></div>`:`<div class="warn" style="background:var(--ac2);color:var(--ac)">Campos principais preenchidos.</div>`;
+}
+
+/*PDF-START*/
+const M=10,W=190;let d;
+const S=s=>String(s==null?'':s).replace(/[\u2013\u2014]/g,'-').replace(/[\u201C\u201D]/g,'"').replace(/[\u2018\u2019]/g,"'");
+function T(s,x,y,o={}){d.setFont('helvetica',o.b?(o.i?'bolditalic':'bold'):(o.i?'italic':'normal'));d.setFontSize(o.s||10);d.text(S(s),x,y,o.a?{align:o.a}:{});}
+function tw(s,fs=10,b){d.setFont('helvetica',b?'bold':'normal');d.setFontSize(fs);return d.getTextWidth(S(s));}
+function bx(x,y,w,h,lab,val,o={}){d.setLineWidth(.25);d.setDrawColor(0);d.rect(x,y,w,h);T(lab,x+1,y+2.4,{s:5.6});val=S(val);if(!val)return;let fs=o.s||9.5,ls,mx;const fit=()=>{d.setFont('helvetica','normal');d.setFontSize(fs);ls=d.splitTextToSize(val,w-2.4);mx=Math.max(1,Math.floor((h-3.2)/(fs*.406)));};fit();while(ls.length>mx&&fs>6.5){fs-=.5;fit();}d.text(ls.slice(0,mx),x+1.2,y+2.9+fs*.353);}
+function bar(y,t){d.setFillColor(0,0,0);d.rect(M,y,W,4.6,'F');d.setTextColor(255,255,255);T(t,105,y+3.3,{b:1,s:8,a:'center'});d.setTextColor(0,0,0);}
+function ck(x,y,lab,on,fs=9.5,b){d.setLineWidth(.25);d.rect(x,y-2.7,3,3);if(on){d.setLineWidth(.45);d.line(x+.5,y-2.2,x+2.5,y-.2);d.line(x+2.5,y-2.2,x+.5,y-.2);d.setLineWidth(.25);}T(lab,x+4,y,{s:fs,b:b});return x+4+tw(lab,fs,b)+4.5;}
+function ckRow(x,y,items,sel,maxX=M+W,fs=9.5,lh=5.5){let cx=x;items.forEach(it=>{const w=4+tw(it,fs)+4.5;if(cx+w>maxX&&cx>x){cx=x;y+=lh;}cx=ck(cx,y,it,sel.includes(it),fs);});return y;}
+function lf(x,y,lab,val,endX,o={}){const fs=o.s||10;let lx=x;if(lab){T(lab,x,y,{s:fs,b:o.b});lx=x+tw(lab,fs,o.b)+1.5;}d.setLineWidth(.2);d.line(lx,y+.9,endX,y+.9);val=S(val);if(!val)return;let vs=fs;const av=endX-lx-1.5;while(tw(val,vs)>av&&vs>6.5)vs-=.5;d.setFont('helvetica','normal');d.setFontSize(vs);let s=val;while(s.length&&d.getTextWidth(s)>av)s=s.slice(0,-1);d.text(s,lx+1,y);}
+function lines(x,y,w,n,text,gap=7.5){d.setFont('helvetica','normal');d.setFontSize(10);const ls=text?d.splitTextToSize(S(text),w-2):[];const N=Math.max(n,ls.length);d.setLineWidth(.2);for(let i=0;i<N;i++){const yy=y+i*gap;d.line(x,yy+.9,x+w,yy+.9);if(ls[i]){d.setFont('helvetica','normal');d.setFontSize(10);d.text(ls[i],x+1,yy);}}return y+(N-1)*gap;}
+function sec(t,y){T(t,105,y,{b:1,s:11,a:'center'});const w=tw(t,11,1);d.setLineWidth(.3);d.line(105-w/2,y+.9,105+w/2,y+.9);}
+function sub(t,x,y){T(t,x,y,{b:1,s:10});const w=tw(t,10,1);d.setLineWidth(.25);d.line(x,y+.9,x+w,y+.9);return x+w;}
+function rodape(t){d.setTextColor(110,110,110);T(t,105,292,{s:6.5,a:'center'});d.setTextColor(0,0,0);}
+
+/* ---- 1. Ficha de prescrição ---- */
+function pdfPresc(){
+ T('APAE',M+15,16,{b:1,s:15,a:'center'});T('Campo Grande - MS',M+15,20.5,{s:7,a:'center'});
+ T('CER',M+W-15,16,{b:1,s:15,a:'center'});T('Centro Especializado',M+W-15,20.5,{s:6.5,a:'center'});T('de Reabilitação',M+W-15,23.5,{s:6.5,a:'center'});
+ T('FICHA DE PRESCRIÇÃO',105,15.5,{b:1,s:15,a:'center'});T('ESPECIFICAÇÕES DE CADEIRAS DE RODAS',105,22,{b:1,s:12,a:'center'});
+ d.setLineWidth(.3);d.line(M,27,M+W,27);
+ let y=34,x;sec('DADOS DO USUÁRIO',y);y+=8;
+ lf(M,y,'Nome:',V('p_nome'),M+W);y+=7.5;
+ const sx=V('p_sexo');T('Sexo:',M,y);x=M+11;x=ck(x,y,'Masculino',sx==='M');ck(x,y,'Feminino',sx==='F');
+ lf(74,y,'Idade:',V('p_idade')?V('p_idade')+' anos':'',106);lf(110,y,'Peso:',V('p_peso')?V('p_peso')+' kg':'',148);lf(152,y,'Altura:',V('p_altura')?V('p_altura')+' m':'',M+W);y+=7.5;
+ lf(M,y,'Endereço:',V('p_end'),128);lf(131,y,'Bairro:',V('p_bairro'),M+W);y+=7.5;
+ lf(M,y,'Município:',V('p_mun'),92);lf(95,y,'Tel.:',[V('p_tel1'),V('p_tel2'),V('p_tel3')].filter(Boolean).join('  /  '),M+W);y+=10;
+ sec('PATOLOGIA',y);y+=8;
+ lf(M,y,'Etiologia:',V('rx_etiol'),120);lf(123,y,'Tempo de Deficiência:',V('rx_tempo'),M+W);y+=7.5;
+ y=ckRow(M+6,y,['Tetraplegia','Paraplegia','Hemiplegia','Amputação','Paralisia Cerebral','Senilidade'],A('rx_pat'));y+=10;
+ sec('MEDIDAS DO USUÁRIO',y);y+=8;
+ const cm=v=>v?v+' cm':'';
+ lf(M,y,'Largura do Assento (A):',cm(V('rx_larg')),M+60,{s:9.5});lf(M+64,y,'Comprimento do Assento (B):',cm(V('rx_comp')),M+126,{s:9.5});lf(M+130,y,'Altura do Encosto (C):',cm(V('rx_alt')),M+W,{s:9.5});y+=10;
+ sec('ESPECIFICAÇÕES DA CADEIRA',y);y+=8;
+ const q=A('rx_quadro');x=sub('Estrutura/quadro:',M,y)+3;x=ck(x,y,'adulto',q.includes('adulto'));ck(x,y,'infantil',q.includes('infantil'));y+=6;
+ y=ckRow(M,y,['Dobrável em "X"','Monobloco','Postural com tilt e/ou reclínio','Postural com reclínio de encosto'],A('rx_tipo'));y+=8;
+ sub('Características de modelos e rodas:',M,y);y+=6;
+ y=ckRow(M,y,['Motorizada','Obeso','Padrão Adulto','Padrão Infantil'],A('rx_modelo'));y+=6;
+ const rd=A('rx_rodad'),rt=A('rx_rodat');
+ T('Rodas dianteiras:',M,y,{s:9.5});x=M+tw('Rodas dianteiras:',9.5)+3;x=ck(x,y,'maciças',rd.includes('maciças'));ck(x,y,'infláveis',rd.includes('infláveis'));
+ T('Rodas traseiras:',112,y,{s:9.5});x=112+tw('Rodas traseiras:',9.5)+3;x=ck(x,y,'maciças',rt.includes('maciças'));ck(x,y,'infláveis',rt.includes('infláveis'));y+=8;
+ const hb=A('rx_hab'),ar=A('rx_aro');
+ sub('Habilidade do usuário:',M,y);sub('Aro de propulsão:',130,y);y+=6;
+ ck(M,y,'Condição plena de impulsionar a cadeira',hb.includes('plena'));x=ck(130,y,'Liso',ar.includes('Liso'));ck(x,y,'Com pino',ar.includes('Com pino'));y+=5.5;
+ ck(M,y,'Condição limitada de impulsionar a cadeira',hb.includes('limitada'));y+=5.5;
+ ck(M,y,'Necessita de terceiros para deslocamento',hb.includes('terceiros'));y+=8;
+ x=sub('Contenção e acessórios:',M,y)+2;T('(* não disponível para todos os modelos)',x,y,{s:7});y+=6;
+ y=ckRow(M,y,['Com apoio de cabeça','Cinto pélvico','Cinto torácico*','Cinto pélvico em Y*','Rodas antitombo*','Mesa de atividades*'],A('rx_cont'));y+=6;
+ const ct=A('rx_ctrl');T('Controle da motorizada:',M,y,{s:9.5});x=M+tw('Controle da motorizada:',9.5)+3;x=ck(x,y,'lado direito',ct.includes('lado direito'));ck(x,y,'lado esquerdo',ct.includes('lado esquerdo'));y+=8;
+ x=sub('Cores:',M,y)+2;T('(não disponível para todos os modelos)',x,y,{s:7});y+=6;
+ y=ckRow(M,y,CORES,A('rx_cor'));y+=8;
+ sub('OBSERVAÇÕES:',M,y);y+=7;y=lines(M,y,W,3,V('rx_obs'),6.5);y+=9;
+ lf(M,y,'DATA:',fd(V('doc_data')),50);lf(54,y,'NOME DO PROFISSIONAL RESPONSÁVEL:',V('prof_nome'),M+W);y+=17;
+ d.setLineWidth(.3);d.line(60,y,150,y);T('Assinatura do profissional responsável',105,y+4,{s:8.5,a:'center'});
+ const rg=[V('prof_nome'),V('prof_reg')].filter(Boolean).join(' - ');if(rg)T(rg,105,y+8,{s:8,a:'center'});
+}
+
+/* ---- 2. Laudo APAC ---- */
+function pdfLaudo(){
+ d.setLineWidth(.3);d.rect(M,10,50,14);T('SUS',M+3,19.5,{b:1,s:15});T('Sistema Único de Saúde',M+17,15.8,{b:1,s:6.8});T('Ministério da Saúde',M+17,19.8,{b:1,s:6.8});
+ d.rect(M+51,10,W-51,14);const cx=M+51+(W-51)/2;T('LAUDO PARA SOLICITAÇÃO/AUTORIZAÇÃO DE',cx,16.3,{b:1,i:1,s:11,a:'center'});T('PROCEDIMENTO AMBULATORIAL',cx,21.5,{b:1,i:1,s:11,a:'center'});T('fls. 1/2',M+W-1.5,13.3,{b:1,i:1,s:7.5,a:'right'});
+ bar(25,'IDENTIFICAÇÃO DO ESTABELECIMENTO DE SAÚDE (SOLICITANTE)');
+ bx(M,30,150,9,'1 - NOME DO ESTABELECIMENTO DE SAÚDE SOLICITANTE',V('est_nome'));bx(M+150,30,40,9,'2 - CNES',V('est_cnes'));
+ bar(40,'IDENTIFICAÇÃO DO PACIENTE');
+ bx(M,45,150,9,'3 - NOME DO PACIENTE',V('p_nome'));bx(M+150,45,40,9,'4 - Nº DO PRONTUÁRIO',V('p_pront'));
+ bx(M,54,62,9,'5 - CARTÃO NACIONAL DE SAÚDE (CNS)',V('p_cns'));bx(M+62,54,30,9,'6 - DATA DE NASCIMENTO',fd(V('p_nasc')));
+ bx(M+92,54,40,9,'7 - SEXO','');const sx=V('p_sexo');ck(M+95,60.8,'Masc.',sx==='M',8.5);ck(M+115,60.8,'Fem.',sx==='F',8.5);
+ bx(M+132,54,58,9,'8 - RAÇA/COR',V('p_raca'));
+ bx(M,63,140,9,'9 - NOME DA MÃE',V('p_mae'));bx(M+140,63,50,9,'10 - TELEFONE DE CONTATO (DDD + Nº)',V('p_tel1'));
+ bx(M,72,140,9,'11 - NOME DO RESPONSÁVEL',V('r_nome'));bx(M+140,72,50,9,'12 - TELEFONE DE CONTATO (DDD + Nº)',V('r_tel'));
+ bx(M,81,190,9,'13 - ENDEREÇO (RUA, Nº, BAIRRO)',[V('p_end'),V('p_bairro')].filter(Boolean).join(' - '));
+ bx(M,90,95,9,'14 - MUNICÍPIO DE RESIDÊNCIA',V('p_mun').toUpperCase());bx(M+95,90,35,9,'15 - CÓD. IBGE MUNICÍPIO',V('p_ibge'));bx(M+130,90,20,9,'16 - UF',V('p_uf').toUpperCase());bx(M+150,90,40,9,'17 - CEP',V('p_cep'));
+ bar(100,'PROCEDIMENTO SOLICITADO');
+ bx(M,105,50,9,'18 - CÓDIGO DO PROCEDIMENTO PRINCIPAL',V('l_cod'));bx(M+50,105,115,9,'19 - NOME DO PROCEDIMENTO PRINCIPAL',V('l_proc'));bx(M+165,105,25,9,'20 - QTDE.',V('l_qtd'));
+ bar(115,'PROCEDIMENTO(S) SECUNDÁRIO(S)');
+ for(let i=1;i<=5;i++){const y=120+(i-1)*8.5,n=18+i*3;bx(M,y,50,8.5,`${n} - CÓDIGO DO PROCEDIMENTO SECUNDÁRIO`,V(`l_s${i}c`));bx(M+50,y,115,8.5,`${n+1} - NOME DO PROCEDIMENTO SECUNDÁRIO`,V(`l_s${i}n`));bx(M+165,y,25,8.5,`${n+2} - QTDE.`,V(`l_s${i}q`));}
+ bar(163.5,'JUSTIFICATIVA DO(S) PROCEDIMENTO(S) SOLICITADO(S)');
+ bx(M,168.5,100,11,'36 - DESCRIÇÃO DO DIAGNÓSTICO',V('l_diag'));bx(M+100,168.5,30,11,'37 - CID10 PRINCIPAL',V('l_cid1').toUpperCase());bx(M+130,168.5,30,11,'38 - CID10 SECUNDÁRIO',V('l_cid2').toUpperCase());bx(M+160,168.5,30,11,'39 - CID10 CAUSAS ASSOC.',V('l_cid3').toUpperCase());
+ bx(M,179.5,190,17,'40 - OBSERVAÇÕES',V('l_obs'),{s:10.5});
+ bar(197.5,'SOLICITAÇÃO');
+ bx(M,202.5,100,9,'41 - NOME DO PROFISSIONAL SOLICITANTE',V('prof_nome'));bx(M+100,202.5,30,9,'42 - DATA DA SOLICITAÇÃO',fd(V('doc_data')));
+ bx(M+130,202.5,60,18,'45 - ASSINATURA E CARIMBO (Nº REGISTRO DO CONSELHO)','');if(V('prof_reg'))T(V('prof_reg'),M+160,219,{s:7,a:'center'});
+ bx(M,211.5,35,9,'43 - DOCUMENTO','');const dt=V('prof_doctipo');ck(M+3,218.2,'CNS',dt==='CNS',8.5);ck(M+18,218.2,'CPF',dt==='CPF',8.5);
+ bx(M+35,211.5,95,9,'44 - Nº DOCUMENTO (CNS/CPF) DO PROFISSIONAL SOLICITANTE',V('prof_doc'));
+ bar(221.5,'AUTORIZAÇÃO');
+ bx(M,226.5,100,9,'46 - NOME DO PROFISSIONAL AUTORIZADOR',V('l_aut_nome'));bx(M+100,226.5,40,9,'47 - CÓD. ÓRGÃO EMISSOR',V('l_aut_org'));bx(M+140,226.5,50,18,'52 - Nº DA AUTORIZAÇÃO (APAC)',V('l_apac'),{s:11});
+ bx(M,235.5,35,9,'48 - DOCUMENTO','');const at=V('l_aut_doctipo');ck(M+3,242.2,'CNS',at==='CNS',8.5);ck(M+18,242.2,'CPF',at==='CPF',8.5);
+ bx(M+35,235.5,105,9,'49 - Nº DOCUMENTO (CNS/CPF) DO PROFISSIONAL AUTORIZADOR',V('l_aut_doc'));
+ bx(M,244.5,35,9,'50 - DATA DA AUTORIZAÇÃO',fd(V('l_aut_data')));bx(M+35,244.5,105,9,'51 - ASSINATURA E CARIMBO (Nº DO REGISTRO DO CONSELHO)','');
+ const vi=fd(V('l_val_ini')),vf=fd(V('l_val_fim'));bx(M+140,244.5,50,9,'53 - PERÍODO DE VALIDADE DA APAC',(vi||vf)?`${vi||'__/__/____'} a ${vf||'__/__/____'}`:'');
+ bar(254.5,'IDENTIFICAÇÃO DO ESTABELECIMENTO DE SAÚDE (EXECUTANTE)');
+ bx(M,259.5,150,9,'54 - NOME FANTASIA DO ESTABELECIMENTO DE SAÚDE EXECUTANTE',V('l_exec_nome'));bx(M+150,259.5,40,9,'55 - CNES',V('l_exec_cnes'));
+ rodape('Campo 45: assinatura digital do profissional solicitante via gov.br (assinador.iti.gov.br).');
+}
+
+/* ---- cabeçalho/rodapé CER-APAE ---- */
+function hdrCER(){
+ T('CER',M+2,17,{b:1,s:17});T('Centro Especializado',M+2,21.3,{s:6.5});T('de Reabilitação',M+2,24.3,{s:6.5});
+ T('APAE',M+W-2,17,{b:1,s:17,a:'right'});T('Campo Grande - MS',M+W-2,21.3,{s:6.5,a:'right'});
+ ['Registro no CNAS - nº 254.754/71-40 - Registro no','Cart° 4º Of. - nº 48.129 - Livro A-155 - CNPJ 03.025.707/0001-40','DECLARADA UTILIDADE PÚBLICA FEDERAL DEC. 94.054 DE 25/02/87','"Autogestão e autodefensores: conquistando caminhos para ser e conviver".'].forEach((l,i)=>T(l,105,13+i*3.3,{s:6.8,a:'center'}));
+ d.setLineWidth(.3);d.line(M,29,M+W,29);
+}
+function ftrCER(){d.setLineWidth(.3);d.line(M,278,M+W,278);T('Rua Carlinda Tognini, 251, Vila Progresso - Campo Grande/MS - CEP: 79050-140',105,283,{s:8,a:'center'});T('Fones: (67) 3045-5005 / 3045-7005 - Email: cer.apae@gmail.com',105,287,{s:8,a:'center'});}
+
+/* ---- 3. Termo sem prova técnica ---- */
+function pdfTermo(){
+ hdrCER();
+ T('CENTRO ESPECIALIZADO DE REABILITAÇÃO - CER/APAE',105,42,{b:1,s:13,a:'center'});
+ T('TERMO DE AUTORIZAÇÃO SEM A PROVA TÉCNICA',105,52,{b:1,s:11,a:'center'});
+ const X=M+12,E=M+W-8,R=!!V('r_nome');
+ const nome=R?V('r_nome'):V('p_nome'),cpf=R?V('r_cpf'):V('p_cpf'),rg=R?V('r_rg'):V('p_rg'),tel=R?(V('r_tel')||V('p_tel1')):V('p_tel1');
+ let y=70;
+ lf(X,y,'Eu,',nome,E-24);T('responsável',E-22.5,y);y+=11;
+ lf(X,y,'pelo Sr.(o) Sr.(a)',V('p_nome'),E);y+=11;
+ lf(X,y,'Autorizo o ato da retirada do equipamento:',V('t_equip'),E);y+=11;
+ lf(X,y,'Procedimento:',V('t_proc'),E);y+=17;
+ T('Sem a devida ',X,y);T('PROVA TÉCNICA.',X+tw('Sem a devida ',10),y,{b:1});y+=10;
+ T('Motivo:',X,y,{b:1});y+=10;
+ y=lines(X,y,E-X,3,V('t_motivo'),8);y+=34;
+ d.setLineWidth(.3);d.line(X,y,X+80,y);y+=5;
+ T('Responsável pela Autorização',X,y,{b:1});T('(assinatura digital gov.br ou manual)',X+tw('Responsável pela Autorização',10,1)+2,y,{s:7,i:1});y+=8;
+ lf(X,y,'CPF:',cpf,X+80,{b:1});y+=8;
+ lf(X,y,'RG:',rg,X+80,{b:1});y+=8;
+ lf(X,y,'Telefone:',tel,X+80,{b:1});
+ lf(E-62,y+6,'DATA:',fd(V('doc_data')),E,{b:1});
+ ftrCER();
+}
+
+/* ---- 4. Autorização para retirada ---- */
+function pdfAut(){
+ hdrCER();
+ T('AUTORIZAÇÃO PARA RETIRADA DE:',105,42,{b:1,s:13,a:'center'});
+ const tp=A('a_tipo');let y=51;
+ ck(68,y,'CADEIRAS DE RODA E/OU BANHO',tp.includes('cadeira'),9.5,1);y+=5.5;
+ ck(68,y,'ORTESES E PROTESES',tp.includes('orteses'),9.5,1);y+=5.5;
+ ck(68,y,'BENGALA/MULETA/ANDADOR',tp.includes('bengala'),9.5,1);
+ const X=M+12,E=M+W-8,resp=V('a_decl')==='responsavel';
+ const eu=resp?V('r_nome'):V('p_nome'),euRG=resp?V('r_rg'):V('p_rg'),euCPF=resp?V('r_cpf'):V('p_cpf');
+ y=80;const o={b:1};
+ lf(X,y,'Eu,',eu,E-23,o);T('portador(a)',E-21.5,y,o);y+=10;
+ lf(X,y,'do RG.',euRG,X+52,o);lf(X+54,y,'e do CPF:',euCPF,X+122,o);ck(X+125,y,'USUÁRIO ou',!resp,10,1);y+=10;
+ let x=ck(X,y,'RESPONSÁVEL PELO PACIENTE',resp,10,1);lf(x-2,y,'',resp?V('p_nome'):'',E);y+=10;
+ lf(X,y,'Portador do RG.',resp?V('p_rg'):'',X+72,o);lf(X+74,y,'e do CPF:',resp?V('p_cpf'):'',E,o);y+=10;
+ lf(X,y,'AUTORIZO O SENHOR(a)',V('a_nome'),E,o);y+=10;
+ lf(X,y,'Portador(a) do RG.Nº.',V('a_rg'),X+80,o);lf(X+82,y,'e do CPF:',V('a_cpf'),E,o);y+=10;
+ T('A retirar no Centro Especializado em Reabilitação CER/APAE, em Campo Grande-',X,y,{b:1,s:9.8});y+=6.5;
+ T('MS, as OPM(S) acima identificadas e abaixo relacionadas:',X,y,{b:1,s:9.8});y+=11;
+ y=lines(X,y,E-X,4,V('a_opms'),8);y+=16;
+ lf(E-92,y,(V('a_local')||'Campo Grande (MS)')+',',fd(V('doc_data')),E,o);y+=22;
+ d.setLineWidth(.3);d.line(E-95,y,E,y);T('Nome e assinatura do Autorizador',E-47.5,y+4.5,{b:1,s:9,a:'center'});if(eu)T(eu,E-47.5,y+9,{s:8.5,a:'center'});y+=19;
+ const nx=X-6;T('Nota: O autorizado deverá apresentar cópias dos documentos pessoais (RG e CPF), para',nx,y,{b:1,s:9.5});y+=5.5;
+ const p1='serem anexados a declaração. ';T(p1,nx,y,{b:1,s:9.5});const u1='SE FOR MOTORISTA DE SECRETARIA, DEVERÁ CONSTAR',ux=nx+tw(p1,9.5,1);T(u1,ux,y,{b:1,s:9.5});d.setLineWidth(.25);d.line(ux,y+.8,ux+tw(u1,9.5,1),y+.8);y+=5.5;
+ const u2='SEU NOME COMO AUTORIZADO.';T(u2,nx,y,{b:1,s:9.5});d.line(nx,y+.8,nx+tw(u2,9.5,1),y+.8);
+ ftrCER();
+}
+/*PDF-END*/
+
+const DOCS={presc:pdfPresc,laudo:pdfLaudo,termo:pdfTermo,aut:pdfAut};
+const NOMES={presc:'Prescricao',laudo:'Laudo',termo:'Termo',aut:'Autorizacao'};
+function gerar(keys,ver){
+ if(!keys.length){alert('Selecione ao menos um documento.');return;}
+ if(!window.jspdf){alert('A biblioteca de PDF não carregou. Verifique a conexão com a internet e recarregue a página.');return;}
+ if(!V('p_nome')&&!confirm('O nome do paciente está em branco. Gerar mesmo assim?'))return;
+ if($('#autoReg').checked)registrar(true);
+ d=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+ keys.forEach((k,i)=>{if(i)d.addPage();DOCS[k]();});
+ const pac=(V('p_nome')||'paciente').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/[^A-Za-z0-9]+/g,'_');
+ d.setProperties({title:'OPM - '+(V('p_nome')||'paciente'),subject:keys.map(k=>NOMES[k]).join(', ')});
+ const fn=`OPM_${keys.length===4?'Completo':keys.map(k=>NOMES[k]).join('_')}_${pac}_${(V('doc_data')||hoje()).replace(/-/g,'')}.pdf`;
+ if(ver){const w=window.open(d.output('bloburl'),'_blank');if(!w)d.save(fn);}else d.save(fn);
+}
+/* ---------- banco de dados anonimizado ---------- */
+const DBK='opm_registros_v1',CFGK='opm_cfg_v1';
+const COLS=[['id','ID do registro'],['registrado_em','Registrado em'],['data_solicitacao','Data da solicitação'],['profissional','Profissional solicitante'],['registro_conselho','Registro no conselho'],['estabelecimento','Estabelecimento solicitante'],['equipe_esf','Equipe ESF'],['municipio','Município'],['bairro','Bairro'],['sexo','Sexo'],['idade','Idade'],['faixa_etaria','Faixa etária'],['raca_cor','Raça/cor'],['peso_kg','Peso (kg)'],['altura_m','Altura (m)'],['imc','IMC'],['possui_responsavel','Possui responsável'],['patologia','Patologia'],['etiologia','Etiologia'],['tempo_deficiencia','Tempo de deficiência'],['diagnostico','Descrição do diagnóstico'],['cid_principal','CID-10 principal'],['cid_secundario','CID-10 secundário'],['cid_causas','CID-10 causas associadas'],['proc_cod','Procedimento principal - código'],['proc_nome','Procedimento principal - nome'],['proc_qtd','Procedimento principal - qtde.'],['secundarios','Procedimentos secundários'],['n_secundarios','Nº de procedimentos secundários'],['largura_assento_cm','Largura do assento (cm)'],['comprimento_assento_cm','Comprimento do assento (cm)'],['altura_encosto_cm','Altura do encosto (cm)'],['estrutura','Estrutura/quadro'],['tipo_cadeira','Tipo de cadeira'],['modelo','Modelo'],['rodas_dianteiras','Rodas dianteiras'],['rodas_traseiras','Rodas traseiras'],['habilidade','Habilidade do usuário'],['aro','Aro de propulsão'],['contencao','Contenção e acessórios'],['controle_motorizada','Controle da motorizada'],['cores','Cores'],['sem_prova_tecnica','Retirada sem prova técnica'],['tipo_retirada','Tipo de OPM a retirar'],['declarante','Declarante da retirada'],['retirada_terceiro','Retirada por terceiro autorizado'],['possui_apac','APAC autorizada'],['data_autorizacao','Data da autorização'],['dias_ate_autorizacao','Dias até a autorização'],['executante','Estabelecimento executante']];
+const jget=(k,def)=>{try{return JSON.parse(localStorage.getItem(k)||'null')??def}catch(_){return def}};
+const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(_){return false}};
+const GS_PADRAO='https://script.google.com/macros/s/AKfycbyL6BD3bEnfUe8wh7eWcWI42Y3xOmpWFEmtWZlgPB2KvyLNQxyFiprKKUOi4g24UeQN/exec';
+const cfg=()=>Object.assign({url:GS_PADRAO},jget(CFGK,{})),db=()=>jget(DBK,[]);
+const nr=s=>{const n=parseFloat(String(s).replace(',','.'));return isFinite(n)?n:null};
+function faixa(i){i=parseInt(i);if(isNaN(i))return'';return i<10?'0-9':i<20?'10-19':i<40?'20-39':i<60?'40-59':i<80?'60-79':'80+';}
+function registro(){
+ let id=V('reg_id');
+ if(!id){id='OPM-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase();$('[name="reg_id"]').value=id;save();}
+ const p=nr(V('p_peso'));let h=nr(V('p_altura'));if(h&&h>3)h=h/100;
+ const secs=[];for(let i=1;i<=5;i++){const c=V(`l_s${i}c`),n=V(`l_s${i}n`),q=V(`l_s${i}q`);if(c||n)secs.push(`${c} ${n}${q?` (${q})`:''}`.trim());}
+ const TP={cadeira:'Cadeira de rodas e/ou banho',orteses:'Órteses e próteses',bengala:'Bengala/muleta/andador'};
+ const HB={plena:'Condição plena de impulsionar',limitada:'Condição limitada de impulsionar',terceiros:'Necessita de terceiros'};
+ const ds=V('doc_data'),da=V('l_aut_data');
+ const dias=ds&&da?Math.round((new Date(da)-new Date(ds))/864e5):'';
+ const sx={M:'Masculino',F:'Feminino'}[V('p_sexo')]||'';
+ return {id,registrado_em:new Date().toLocaleString('pt-BR'),data_solicitacao:fd(ds),profissional:V('prof_nome'),registro_conselho:V('prof_reg'),estabelecimento:V('est_nome'),
+  equipe_esf:V('p_esf'),municipio:V('p_mun'),bairro:V('p_bairro'),sexo:sx,idade:nr(V('p_idade'))??'',faixa_etaria:faixa(V('p_idade')),raca_cor:V('p_raca'),
+  peso_kg:p??'',altura_m:h?+h.toFixed(2):'',imc:p&&h?+(p/(h*h)).toFixed(1):'',possui_responsavel:V('r_nome')?'Sim':'Não',
+  patologia:V('rx_pat'),etiologia:V('rx_etiol'),tempo_deficiencia:V('rx_tempo'),diagnostico:V('l_diag'),cid_principal:V('l_cid1').toUpperCase(),cid_secundario:V('l_cid2').toUpperCase(),cid_causas:V('l_cid3').toUpperCase(),
+  proc_cod:V('l_cod'),proc_nome:V('l_proc'),proc_qtd:V('l_qtd'),secundarios:secs.join(' | '),n_secundarios:secs.length,
+  largura_assento_cm:nr(V('rx_larg'))??'',comprimento_assento_cm:nr(V('rx_comp'))??'',altura_encosto_cm:nr(V('rx_alt'))??'',
+  estrutura:V('rx_quadro'),tipo_cadeira:V('rx_tipo'),modelo:V('rx_modelo'),rodas_dianteiras:V('rx_rodad'),rodas_traseiras:V('rx_rodat'),habilidade:A('rx_hab').map(x=>HB[x]||x).join(', '),
+  aro:V('rx_aro'),contencao:V('rx_cont'),controle_motorizada:V('rx_ctrl'),cores:V('rx_cor'),
+  sem_prova_tecnica:(V('t_equip')||V('t_motivo'))?'Sim':'Não',tipo_retirada:A('a_tipo').map(x=>TP[x]).join(', '),declarante:V('a_decl')==='responsavel'?'Responsável':'Usuário',
+  retirada_terceiro:V('a_nome')?'Sim':'Não',possui_apac:V('l_apac')?'Sim':'Não',data_autorizacao:fd(da),dias_ate_autorizacao:dias,executante:V('l_exec_nome')};
+}
+function dbMsg(t){$('#dbStatus').textContent=t;}
+function enviar(r){const u=cfg().url;if(!u)return Promise.resolve(false);return fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({cols:COLS.map(c=>c[0]),heads:COLS.map(c=>c[1]),row:r})}).then(()=>true).catch(()=>false);}
+function registrar(silent){
+ if(!V('l_proc')&&!V('l_cod')&&!V('rx_larg')){if(!silent)alert('Preencha ao menos o procedimento do laudo ou as medidas da cadeira antes de registrar.');return;}
+ const r=registro(),a=db(),i=a.findIndex(x=>x.id===r.id);if(i>=0)a[i]=r;else a.push(r);
+ if(!jset(DBK,a)){dbMsg('Não foi possível salvar neste navegador.');return;}
+ renderDb();dbMsg(`Registro ${r.id} ${i>=0?'atualizado':'salvo'} neste navegador.`);
+ enviar(r).then(ok=>{if(cfg().url)dbMsg(ok?`Registro ${r.id} salvo e enviado à planilha online.`:`Registro ${r.id} salvo neste navegador; falha no envio à planilha (use “Reenviar todos” depois).`);});
+}
+function csv(){const a=db();if(!a.length){alert('Banco vazio.');return;}
+ const q=v=>{const s=String(v??'');return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+ const out='﻿'+[COLS.map(c=>q(c[1])).join(';'),...a.map(r=>COLS.map(([k])=>q(typeof r[k]==='number'?String(r[k]).replace('.',','):r[k])).join(';'))].join('\r\n');
+ const url=URL.createObjectURL(new Blob([out],{type:'text/csv;charset=utf-8'}));const l=document.createElement('a');l.href=url;l.download=`banco_OPM_anonimizado_${hoje().replace(/-/g,'')}.csv`;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);}
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function cont(a,k){const m={};a.forEach(r=>String(r[k]||'Não informado').split(/, | \| /).forEach(v=>{v=v||'Não informado';m[v]=(m[v]||0)+1}));return Object.entries(m).sort((x,y)=>y[1]-x[1]);}
+function tab(t,rows){return `<div style="min-width:220px;flex:1"><div class="lbl" style="font-weight:600">${t}</div><table style="width:100%;border-collapse:collapse;font-size:13.5px">${rows.map(([k,v])=>`<tr><td style="padding:3px 0;border-bottom:1px solid var(--bd)">${esc(k)}</td><td style="text-align:right;border-bottom:1px solid var(--bd)">${v}</td></tr>`).join('')}</table></div>`;}
+function renderDb(){
+ const a=db();
+ if(!a.length){$('#dbResumo').innerHTML='<p class="hint" style="margin:0">Nenhum registro ainda.</p>';$('#dbLista').innerHTML='';return;}
+ const med=k=>{const v=a.map(r=>r[k]).filter(x=>typeof x==='number').sort((x,y)=>x-y);if(!v.length)return'-';const m=v.length>>1;return String(v.length%2?v[m]:+((v[m-1]+v[m])/2).toFixed(1)).replace('.',',');};
+ $('#dbResumo').innerHTML=`<p style="margin:0 0 10px"><b>${a.length}</b> solicitação(ões) registrada(s). Medianas — largura do assento: <b>${med('largura_assento_cm')} cm</b> · comprimento: <b>${med('comprimento_assento_cm')} cm</b> · encosto: <b>${med('altura_encosto_cm')} cm</b> · idade: <b>${med('idade')==='-'?'-':med('idade')}</b></p><div style="display:flex;flex-wrap:wrap;gap:18px">${tab('OPM solicitada',cont(a,'proc_nome'))}${tab('Patologia',cont(a,'patologia'))}${tab('Equipe ESF',cont(a,'equipe_esf'))}${tab('Faixa etária',cont(a,'faixa_etaria'))}${tab('Sexo',cont(a,'sexo'))}${tab('Habilidade',cont(a,'habilidade'))}</div>`;
+ $('#dbLista').innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:620px"><tr style="text-align:left;color:var(--mu)"><th>ID</th><th>Data</th><th>OPM</th><th>Medidas A/B/C</th><th>ESF</th><th>CID</th></tr>${a.slice(-10).reverse().map(r=>`<tr><td style="padding:4px 6px 4px 0;border-top:1px solid var(--bd)">${esc(r.id)}</td><td style="border-top:1px solid var(--bd)">${esc(r.data_solicitacao)}</td><td style="border-top:1px solid var(--bd)">${esc(r.proc_nome)}</td><td style="border-top:1px solid var(--bd)">${[r.largura_assento_cm,r.comprimento_assento_cm,r.altura_encosto_cm].map(x=>x===''?'-':x).join(' / ')}</td><td style="border-top:1px solid var(--bd)">${esc(r.equipe_esf)}</td><td style="border-top:1px solid var(--bd)">${esc(r.cid_principal)}</td></tr>`).join('')}</table>`;
+}
+const GS_CODE="/**\n * COLETOR DO BANCO ANONIMIZADO DE OPM\n * UBS Ildefonso Pedroso - Dourados/MS\n *\n * Recebe os registros enviados pelo formulario (aba 7 - Banco de dados),\n * grava na planilha e envia os dados por e-mail ao endereco institucional.\n * Os registros NAO contem dados pessoais do paciente.\n *\n * Instalacao: Planilha > Extensoes > Apps Script > colar este codigo > salvar.\n * Depois: Implantar > Nova implantacao > App da Web\n *         Executar como: Eu | Quem pode acessar: Qualquer pessoa\n */\n\n// ===================== CONFIGURACAO =====================\nconst CONFIG = {\n  ABA: 'Registros OPM',\n  // E-mail(s) institucional(is) de destino. Varios: separe por virgula.\n  EMAIL_DESTINO: 'seu.email@institucional.gov.br',\n  // true = envia um e-mail a cada solicitacao registrada/atualizada\n  ENVIAR_A_CADA_REGISTRO: true,\n  // true = envia novo e-mail tambem quando um registro existente e atualizado\n  ENVIAR_ATUALIZACOES: false,\n  // Anexa o registro em CSV no e-mail individual\n  ANEXAR_CSV_NO_REGISTRO: true,\n  // Pasta do Google Drive onde ficam as copias de seguranca (CSV) dos dados nao pessoais\n  PASTA_DRIVE: 'Banco OPM - dados anonimizados',\n  ASSUNTO_PREFIXO: '[OPM] ',\n  NOME_REMETENTE: 'Banco OPM - UBS Ildefonso Pedroso'\n};\n// =========================================================\n\n/** Recebe os dados do formulario. */\nfunction doPost(e) {\n  if (!e || !e.postData) {\n    console.log('doPost s\u00f3 funciona quando o formul\u00e1rio envia dados. ' +\n      'Para testar pelo editor, selecione a fun\u00e7\u00e3o \"testarEmail\" ou \"testarRegistro\" e clique em Executar.');\n    return texto_('sem dados');\n  }\n  const lock = LockService.getScriptLock();\n  lock.waitLock(20000);\n  try {\n    const data = JSON.parse(e.postData.contents);\n    const sh = obterAba_(data.heads);\n    if (data.teste) return texto_('ok');\n\n    const linha = data.cols.map(function (c) { return limpar_(data.row[c]); });\n    const n = sh.getLastRow();\n    const ids = n > 1 ? sh.getRange(2, 1, n - 1, 1).getValues().map(function (r) { return r[0]; }) : [];\n    const i = ids.indexOf(data.row.id);\n    const novo = i < 0;\n\n    if (novo) sh.appendRow(linha);\n    else sh.getRange(i + 2, 1, 1, linha.length).setValues([linha]);\n\n    if (CONFIG.ENVIAR_A_CADA_REGISTRO && (novo || CONFIG.ENVIAR_ATUALIZACOES)) {\n      try {\n        enviarEmailRegistro_(data.heads, linha, novo ? 'Nova solicita\u00e7\u00e3o' : 'Solicita\u00e7\u00e3o atualizada');\n      } catch (err) {\n        console.error('Falha no e-mail: ' + err);\n      }\n    }\n    return texto_('ok');\n  } finally {\n    lock.releaseLock();\n  }\n}\n\nfunction doGet() { return texto_('Coletor OPM ativo'); }\n\n// ===================== E-MAIL POR REGISTRO =====================\nfunction enviarEmailRegistro_(heads, linha, status) {\n  const get = function (nome) { const k = heads.indexOf(nome); return k >= 0 ? linha[k] : ''; };\n  const id = get('ID do registro');\n  const opm = get('Procedimento principal - nome') || 'OPM n\u00e3o informada';\n\n  let tabela = '';\n  heads.forEach(function (h, k) {\n    const v = linha[k];\n    if (v === '' || v === null || v === undefined) return;\n    tabela += '<tr><td style=\"padding:4px 10px 4px 0;color:#555;border-bottom:1px solid #eee\">' + esc_(h) +\n      '</td><td style=\"padding:4px 0;border-bottom:1px solid #eee\"><b>' + esc_(v) + '</b></td></tr>';\n  });\n\n  const html =\n    '<div style=\"font-family:Arial,sans-serif;font-size:14px;color:#1c2631\">' +\n    '<p><b>' + esc_(status) + '</b> registrada no banco anonimizado de OPM.</p>' +\n    '<table style=\"border-collapse:collapse;font-size:13px\">' + tabela + '</table>' +\n    '<p style=\"font-size:12px;color:#777;margin-top:14px\">Registro sem dados pessoais do paciente. ' +\n    'Planilha consolidada: <a href=\"' + SpreadsheetApp.getActiveSpreadsheet().getUrl() + '\">abrir</a>.</p></div>';\n\n  const opcoes = { to: CONFIG.EMAIL_DESTINO, subject: CONFIG.ASSUNTO_PREFIXO + status + ' - ' + opm + ' - ' + id,\n    htmlBody: html, name: CONFIG.NOME_REMETENTE };\n  if (CONFIG.ANEXAR_CSV_NO_REGISTRO) {\n    opcoes.attachments = [Utilities.newBlob(\n      '\ufeff' + [heads.map(csv_).join(';'), linha.map(csv_).join(';')].join('\\r\\n'),\n      'text/csv', 'registro_' + id + '.csv')];\n  }\n  MailApp.sendEmail(opcoes);\n}\n\n// ===================== RELATORIO CONSOLIDADO =====================\n/**\n * Envia por e-mail a planilha completa (XLSX) com um resumo por OPM, ESF e patologia.\n * Pode ser executado manualmente ou de forma automatica (ver criarEnvioSemanal).\n */\nfunction enviarRelatorioConsolidado() {\n  const ss = SpreadsheetApp.getActiveSpreadsheet();\n  const sh = ss.getSheetByName(CONFIG.ABA);\n  if (!sh || sh.getLastRow() < 2) { console.log('Sem registros para enviar.'); return; }\n\n  const dados = sh.getDataRange().getValues();\n  const heads = dados[0], linhas = dados.slice(1);\n  const hoje = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy');\n\n  const blocos = ['Procedimento principal - nome', 'Equipe ESF', 'Patologia', 'Faixa et\u00e1ria', 'Habilidade do usu\u00e1rio']\n    .map(function (col) { return resumoHtml_(col, contar_(heads, linhas, col)); }).join('');\n\n  const html =\n    '<div style=\"font-family:Arial,sans-serif;font-size:14px;color:#1c2631\">' +\n    '<p>Relat\u00f3rio consolidado do banco anonimizado de OPM em ' + hoje + '.</p>' +\n    '<p>Total de solicita\u00e7\u00f5es registradas: <b>' + linhas.length + '</b></p>' + blocos +\n    '<p style=\"font-size:12px;color:#777\">Planilha completa em anexo (XLSX). Sem dados pessoais do paciente.</p></div>';\n\n  const url = 'https://docs.google.com/spreadsheets/d/' + ss.getId() + '/export?format=xlsx&gid=' + sh.getSheetId();\n  const xlsx = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() } })\n    .getBlob().setName('Banco_OPM_' + hoje.replace(/\\//g, '-') + '.xlsx');\n\n  MailApp.sendEmail({ to: CONFIG.EMAIL_DESTINO, subject: CONFIG.ASSUNTO_PREFIXO + 'Relat\u00f3rio consolidado - ' + hoje,\n    htmlBody: html, attachments: [xlsx], name: CONFIG.NOME_REMETENTE });\n}\n\n/** Agenda o relatorio consolidado para toda segunda-feira, por volta das 7h. Execute uma vez. */\nfunction criarEnvioSemanal() {\n  removerEnvioAutomatico();\n  ScriptApp.newTrigger('enviarRelatorioConsolidado').timeBased()\n    .onWeekDay(ScriptApp.WeekDay.MONDAY).atHour(7).create();\n}\n\n/** Agenda o relatorio consolidado para o dia 1 de cada mes, por volta das 7h. Execute uma vez. */\nfunction criarEnvioMensal() {\n  removerEnvioAutomatico();\n  ScriptApp.newTrigger('enviarRelatorioConsolidado').timeBased().onMonthDay(1).atHour(7).create();\n}\n\n// ===================== ARMAZENAMENTO NO DRIVE =====================\n/**\n * Salva uma copia CSV da aba \"Registros OPM\" na pasta do Drive definida em CONFIG.PASTA_DRIVE.\n * Mantem um arquivo \"Banco_OPM_atual.csv\" (sempre substituido) e um arquivo datado por dia.\n */\nfunction salvarCopiaNoDrive() {\n  const ss = SpreadsheetApp.getActiveSpreadsheet();\n  const sh = ss.getSheetByName(CONFIG.ABA);\n  if (!sh || sh.getLastRow() < 2) { console.log('Sem registros para salvar.'); return; }\n  const pasta = obterPasta_();\n  const conteudo = '\ufeff' + sh.getDataRange().getValues().map(function (r) {\n    return r.map(function (v) {\n      if (v instanceof Date) v = Utilities.formatDate(v, Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');\n      return csv_(v);\n    }).join(';');\n  }).join('\\r\\n');\n  const dia = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');\n  [['Banco_OPM_atual.csv'], ['Banco_OPM_' + dia + '.csv']].forEach(function (n) {\n    const it = pasta.getFilesByName(n[0]);\n    if (it.hasNext()) it.next().setContent(conteudo);\n    else pasta.createFile(n[0], conteudo, MimeType.CSV);\n  });\n  console.log('C\u00f3pia salva no Drive: ' + pasta.getUrl());\n}\n\n/** Agenda a copia no Drive todos os dias por volta das 22h. Execute uma vez. */\nfunction criarCopiaDiariaNoDrive() {\n  ScriptApp.getProjectTriggers().forEach(function (t) {\n    if (t.getHandlerFunction() === 'salvarCopiaNoDrive') ScriptApp.deleteTrigger(t);\n  });\n  ScriptApp.newTrigger('salvarCopiaNoDrive').timeBased().everyDays(1).atHour(22).create();\n  salvarCopiaNoDrive();\n}\n\n/** Move a propria planilha para a pasta do Drive, deixando tudo no mesmo lugar. Execute uma vez. */\nfunction organizarPlanilhaNaPasta() {\n  const pasta = obterPasta_();\n  DriveApp.getFileById(SpreadsheetApp.getActiveSpreadsheet().getId()).moveTo(pasta);\n  console.log('Planilha movida para: ' + pasta.getUrl());\n}\n\nfunction obterPasta_() {\n  const it = DriveApp.getFoldersByName(CONFIG.PASTA_DRIVE);\n  return it.hasNext() ? it.next() : DriveApp.createFolder(CONFIG.PASTA_DRIVE);\n}\n\n/** Cancela o envio automatico do relatorio. */\nfunction removerEnvioAutomatico() {\n  ScriptApp.getProjectTriggers().forEach(function (t) {\n    if (t.getHandlerFunction() === 'enviarRelatorioConsolidado') ScriptApp.deleteTrigger(t);\n  });\n}\n\n/** Teste: envia um e-mail simples ao destino configurado. Execute uma vez para autorizar o script. */\nfunction testarEmail() {\n  MailApp.sendEmail(CONFIG.EMAIL_DESTINO, CONFIG.ASSUNTO_PREFIXO + 'Teste do coletor',\n    'O coletor do banco de OPM est\u00e1 configurado corretamente.\\nPlanilha: ' +\n    SpreadsheetApp.getActiveSpreadsheet().getUrl());\n  console.log('Cota restante de e-mails hoje: ' + MailApp.getRemainingDailyQuota());\n}\n\n/** Teste completo pelo editor: simula um envio do formulario (grava linha de teste e envia e-mail). */\nfunction testarRegistro() {\n  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.ABA);\n  if (!sh || sh.getLastRow() === 0) {\n    console.log('A aba \"' + CONFIG.ABA + '\" ainda n\u00e3o tem cabe\u00e7alho. Primeiro implante o App da Web e clique em ' +\n      '\"Testar\" na aba 7 do formul\u00e1rio; depois execute testarRegistro novamente.');\n    return;\n  }\n  const heads = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];\n  const valores = { 'ID do registro': 'TESTE-' + Date.now(), 'Registrado em': new Date().toLocaleString('pt-BR'),\n    'Data da solicita\u00e7\u00e3o': Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy'),\n    'Procedimento principal - nome': 'CADEIRA DE RODAS (TESTE)', 'Largura do assento (cm)': 44,\n    'Comprimento do assento (cm)': 42, 'Altura do encosto (cm)': 40, 'Equipe ESF': 'ESF 60 - Ip\u00ea Amarelo' };\n  const row = {};\n  heads.forEach(function (h) { row[h] = valores[h] !== undefined ? valores[h] : ''; });\n  row.id = valores['ID do registro'];\n  const r = doPost({ postData: { contents: JSON.stringify({ cols: heads, heads: heads, row: row }) } });\n  console.log('Resultado: ' + r.getContent() + '. Confira a planilha e o e-mail. Apague a linha de teste depois.');\n}\n\n// ===================== AUXILIARES =====================\nfunction obterAba_(heads) {\n  const ss = SpreadsheetApp.getActiveSpreadsheet();\n  const sh = ss.getSheetByName(CONFIG.ABA) || ss.insertSheet(CONFIG.ABA);\n  if (sh.getLastRow() === 0 && heads && heads.length) {\n    sh.appendRow(heads);\n    sh.setFrozenRows(1);\n    sh.getRange(1, 1, 1, heads.length).setFontWeight('bold').setBackground('#e5f2ec');\n  }\n  return sh;\n}\nfunction limpar_(v) {\n  if (v === undefined || v === null) return '';\n  return (typeof v === 'string' && /^[=+@-]/.test(v)) ? \"'\" + v : v;\n}\nfunction contar_(heads, linhas, col) {\n  const k = heads.indexOf(col), m = {};\n  if (k < 0) return [];\n  linhas.forEach(function (r) {\n    String(r[k] || 'N\u00e3o informado').split(/, | \\| /).forEach(function (v) { v = v || 'N\u00e3o informado'; m[v] = (m[v] || 0) + 1; });\n  });\n  return Object.keys(m).map(function (x) { return [x, m[x]]; }).sort(function (a, b) { return b[1] - a[1]; });\n}\nfunction resumoHtml_(titulo, pares) {\n  if (!pares.length) return '';\n  return '<p style=\"margin:14px 0 4px\"><b>' + esc_(titulo.replace(' - nome', '')) + '</b></p>' +\n    '<table style=\"border-collapse:collapse;font-size:13px\">' + pares.map(function (p) {\n      return '<tr><td style=\"padding:3px 16px 3px 0;border-bottom:1px solid #eee\">' + esc_(p[0]) +\n        '</td><td style=\"text-align:right;border-bottom:1px solid #eee\">' + p[1] + '</td></tr>';\n    }).join('') + '</table>';\n}\nfunction csv_(v) {\n  const s = String(v === null || v === undefined ? '' : v);\n  return /[;\"\\n]/.test(s) ? '\"' + s.replace(/\"/g, '\"\"') + '\"' : s;\n}\nfunction esc_(s) {\n  return String(s).replace(/[&<>\"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;' }[c]; });\n}\nfunction texto_(t) { return ContentService.createTextOutput(t); }\n";
+$('#gsCode').value=GS_CODE;
+$('#gsUrl').value=cfg().url||'';
+$('#gsSalvar').onclick=()=>{const u=$('#gsUrl').value.trim();if(u&&!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)){alert('A URL deve começar com https://script.google.com/ e terminar em /exec.');return;}jset(CFGK,Object.assign(cfg(),{url:u}));dbMsg(u?'URL da planilha salva.':'Envio online desativado.');};
+$('#gsTeste').onclick=()=>{const u=cfg().url;if(!u){alert('Salve a URL primeiro.');return;}fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({teste:true,cols:COLS.map(c=>c[0]),heads:COLS.map(c=>c[1])})}).then(()=>dbMsg('Teste enviado. Confira se a aba “Registros OPM” apareceu na planilha com o cabeçalho.')).catch(()=>dbMsg('Falha no teste: verifique a URL e a implantação (acesso: Qualquer pessoa).'));};
+$('#gsCopiar').onclick=()=>{const t=$('#gsCode');t.select();try{navigator.clipboard.writeText(t.value).then(()=>dbMsg('Código copiado.'),()=>{document.execCommand('copy');dbMsg('Código copiado.')})}catch(_){document.execCommand('copy');dbMsg('Código copiado.')}};
+$('#regAgora').onclick=()=>registrar(false);
+$('#expCsv').onclick=csv;
+$('#sync').onclick=async()=>{const a=db();if(!cfg().url){alert('Configure a URL da planilha abaixo.');return;}if(!a.length){alert('Banco vazio.');return;}let ok=0;for(const r of a){if(await enviar(r))ok++;dbMsg(`Enviando… ${ok}/${a.length}`);await new Promise(s=>setTimeout(s,400));}dbMsg(`${ok} de ${a.length} registro(s) enviados à planilha.`);};
+$('#limpaDb').onclick=()=>{if(!confirm('Apagar TODOS os registros deste navegador? Exporte o CSV antes, se necessário. A planilha online não é afetada.'))return;jset(DBK,[]);renderDb();dbMsg('Banco local apagado.');};
+$('#autoReg').checked=cfg().autoReg!==false;$('#autoReg').onchange=e=>jset(CFGK,Object.assign(cfg(),{autoReg:e.target.checked}));
+renderDb();
+
+$$('[data-pdf]').forEach(b=>b.onclick=()=>gerar(b.dataset.pdf.split(',')));
+const sel=()=>$$('.sel').filter(c=>c.checked).map(c=>c.value);
+$('#gSel').onclick=()=>gerar(sel());$('#vSel').onclick=()=>gerar(sel(),true);
+
+load();if(!V('doc_data'))$('[name="doc_data"]').value=hoje();calcIdade();
+</script>
+</body>
+</html>

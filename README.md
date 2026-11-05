@@ -8,4 +8,11 @@ nas planilhas de monitoramento dos indicadores C2, C3, C4, C5, C6 e C7, com pain
 - O servidor (Google Apps Script) guarda só o registro de uso e, quando escolhido, cria a planilha no Google Planilhas.
 - Regras: Notas Metodológicas C2 a C7 (SAPS/Ministério da Saúde). Modelo das planilhas de vigilância da UBS Ildefonso Pedroso.
 
+## Formulários de OPM (cadeira de rodas · CER/APAE)
+
+- Endereço: https://joaoinovaaps-maker.github.io/vigilancia-aps/opm/
+- Ficha de prescrição, Laudo APAC, Termo sem prova técnica e Autorização de retirada, com geração de PDF para assinatura digital gov.br.
+- Os dados do paciente ficam apenas no navegador de quem preenche e não são enviados a nenhum servidor.
+- Para fins de estudo, é enviado ao Google Apps Script (`opm/Codigo_Coletor_OPM.gs`) somente um registro anonimizado: OPM solicitada, medidas e especificações da cadeira, perfil clínico e demográfico agregado e território. Esse registro é armazenado no Google Drive e enviado ao e-mail institucional.
+
 Secretaria Municipal de Saúde de Dourados · LAB InovaAPS · Fiocruz
