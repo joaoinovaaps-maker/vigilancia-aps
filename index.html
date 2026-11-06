@@ -1136,8 +1136,13 @@ async function criarGoogle(){
 function registrarUso(formato, email, link){
   const cods=ORDEM_NOMINAIS.filter(c=>E.dados[c]);
   const equipes=[...new Set(cods.flatMap(c=>E.dados[c].map(g=>g.equipe)))];
+  // resultados agregados (sem dados de pacientes) para o painel da gestão na Plataforma da Preceptoria
+  const comp=E.ref? E.ref.getFullYear()+'-'+String(E.ref.getMonth()+1).padStart(2,'0') : new Date().toISOString().slice(0,7);
+  const resultados=[];
+  cods.forEach(c=>{ const P=prospeccao(c,E.dados[c]); if(P) resultados.push({equipe:'UBS', indicador:c, nome:IND[c].curto, valor:Math.round(P.res*10)/10, classificacao:P.cls, pessoas:E.dados[c].length});
+    equipes.forEach(e=>{ const g=E.dados[c].filter(x=>x.equipe===e); if(!g.length) return; const Q=prospeccao(c,g); if(Q) resultados.push({equipe:e, indicador:c, nome:IND[c].curto, valor:Math.round(Q.res*10)/10, classificacao:Q.cls, pessoas:g.length}); }); });
   chamar('registrarUso',{nome:E.pessoa.nome, categoria:E.pessoa.categoria, ubs:E.pessoa.ubs, indicadores:cods.join(', '), pessoas:cods.map(c=>c+': '+E.dados[c].length).join(' · '),
-    equipes:equipes.join(', '), formato, email, link, navegador:navigator.userAgent}).catch(()=>{});
+    equipes:equipes.join(', '), formato, email, link, navegador:navigator.userAgent, competencia:comp, resultados:resultados}).catch(()=>{});
 }
 
 pintarLogos(); render();
