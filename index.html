@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#1d4f91">
 <style>
 :root{
-  --bg:#f2f5f4; --card:#ffffff; --tx:#16231f; --mut:#56645f; --bd:#d6e0dc; --pri:#1d4f91; --pri-d:#08573e; --pri2:#e2f1ea;
+  --bg:#f3f6fa; --card:#ffffff; --tx:#1c2733; --mut:#5f6f82; --bd:#dde5ee; --pri:#1d4f91; --pri-d:#0f345e; --pri2:#e3ecf6;
   --azul:#24508f; --azul2:#e5edf8; --ok:#1f7a3d; --ok2:#dcf1e2; --warn:#8a6100; --warn2:#fff1cc; --err:#a3261c; --err2:#fbe1de;
   --c-otimo:#b7e1c3; --c-bom:#dcefd0; --c-suf:#fff0c2; --c-reg:#f8d3d0;
   --sombra:0 1px 2px rgba(16,40,32,.06),0 8px 24px rgba(16,40,32,.06);
@@ -47,14 +47,14 @@ main{padding-bottom:60px}
 .campo small{color:var(--mut);font-size:.82rem}
 .acoes{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px}
 .btn{border:1.5px solid var(--bd);background:#fff;border-radius:11px;padding:12px 18px;font-weight:700;cursor:pointer}
-.btn:focus-visible{outline:3px solid #f2b705;outline-offset:2px}
+.btn:focus-visible{outline:3px solid #3a86bd;outline-offset:2px}
 .btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}.btn.pri:hover{background:var(--pri-d)}
 .btn.azul{background:var(--azul);border-color:var(--azul);color:#fff}
 .btn:disabled{opacity:.5;cursor:default}
 /* Envio */
 .zona{display:block;width:100%;border:2px dashed #9bb8ad;border-radius:14px;padding:28px 16px;text-align:center;background:#f8fbfa;cursor:pointer;transition:background .15s}
 .zona.sobre{background:var(--pri2);border-color:var(--pri)}
-.zona:focus-visible{outline:3px solid #f2b705;outline-offset:2px}
+.zona:focus-visible{outline:3px solid #3a86bd;outline-offset:2px}
 .zona-ic{display:block;height:44px;margin:0 auto 6px;color:var(--pri)}
 .zona-ic svg{display:block;width:42px;height:42px;margin:0 auto}
 .zona-t{display:block;font-weight:700;font-size:1.05rem;line-height:1.3}
@@ -572,17 +572,17 @@ function montarPlanilha(dados, ctx){
  * mesclagens, larguras, painéis congelados, validação de lista, formatação condicional e imagens.
  */
 const ESTILOS = {
-  titulo:{b:1,sz:15,fg:'0B6E4F'}, tituloPainel:{b:1,sz:18,fg:'0B6E4F',va:'center'},
-  sub:{sz:10,fg:'5D6E6B',i:1,wrap:1,va:'top'},
-  grupo:{b:1,bg:'E2F1EA',fg:'0B6E4F',ha:'center'}, grupoBP:{b:1,bg:'DCE7F5',fg:'24508F',ha:'center'}, grupoAux:{bg:'F2F2F2',fg:'888888',ha:'center',sz:9},
-  hdr:{b:1,bg:'0B6E4F',fg:'FFFFFF',wrap:1,ha:'center',va:'center',bd:1}, hdrBP:{b:1,bg:'24508F',fg:'FFFFFF',wrap:1,ha:'center',va:'center',bd:1},
-  hdrAux:{bg:'F2F2F2',fg:'888888',sz:8,wrap:1,ha:'center',va:'center',bd:1}, hdrLeve:{b:1,bg:'E2F1EA',fg:'0B6E4F',bd:1,va:'center'},
+  titulo:{b:1,sz:15,fg:'1D4F91'}, tituloPainel:{b:1,sz:18,fg:'1D4F91',va:'center'},
+  sub:{sz:10,fg:'5F6F82',i:1,wrap:1,va:'top'},
+  grupo:{b:1,bg:'E3ECF6',fg:'1D4F91',ha:'center'}, grupoBP:{b:1,bg:'E1EFF8',fg:'2B6A99',ha:'center'}, grupoAux:{bg:'F2F2F2',fg:'888888',ha:'center',sz:9},
+  hdr:{b:1,bg:'1D4F91',fg:'FFFFFF',wrap:1,ha:'center',va:'center',bd:1}, hdrBP:{b:1,bg:'3A86BD',fg:'FFFFFF',wrap:1,ha:'center',va:'center',bd:1},
+  hdrAux:{bg:'F2F2F2',fg:'888888',sz:8,wrap:1,ha:'center',va:'center',bd:1}, hdrLeve:{b:1,bg:'E3ECF6',fg:'1D4F91',bd:1,va:'center'},
   cel:{bd:1,va:'center'}, celWrap:{bd:1,wrap:1,va:'center'}, centro:{ha:'center'}, centroNeg:{ha:'center',b:1},
   aux:{fg:'999999',sz:8,ha:'center',bg:'FAFAFA'},
-  secao:{b:1,sz:12,fg:'0B6E4F'}, secaoPainel:{b:1,sz:12,fg:'FFFFFF',bg:'0B6E4F',va:'center'},
-  rotulo:{b:1,ha:'right',va:'center'}, filtro:{b:1,bg:'FFF2CC',bd:1,ha:'center',va:'center',sz:11}, nota:{sz:9,fg:'5D6E6B',i:1,wrap:1,va:'center'},
-  cardRot:{b:1,sz:9,fg:'5D6E6B',bg:'F3F7F5',ha:'center',va:'center'}, cardNum:{b:1,sz:20,fg:'0B6E4F',bg:'F3F7F5',ha:'center',va:'center',nf:'0.0 "pts"'},
-  cardCls:{b:1,sz:11,ha:'center',va:'center',bg:'F3F7F5'},
+  secao:{b:1,sz:12,fg:'1D4F91'}, secaoPainel:{b:1,sz:12,fg:'FFFFFF',bg:'1D4F91',va:'center'},
+  rotulo:{b:1,ha:'right',va:'center'}, filtro:{b:1,bg:'FFF2CC',bd:1,ha:'center',va:'center',sz:11}, nota:{sz:9,fg:'5F6F82',i:1,wrap:1,va:'center'},
+  cardRot:{b:1,sz:9,fg:'5F6F82',bg:'F3F6FA',ha:'center',va:'center'}, cardNum:{b:1,sz:20,fg:'1D4F91',bg:'F3F6FA',ha:'center',va:'center',nf:'0.0 "pts"'},
+  cardCls:{b:1,sz:11,ha:'center',va:'center',bg:'F3F6FA'},
   num1:{nf:'0.0'}, num1c:{nf:'0.0',ha:'center'}, pct:{nf:'0%'}, pctc:{nf:'0%',ha:'center',b:1}
 };
 
